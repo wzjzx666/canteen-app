@@ -17,15 +17,15 @@
 	/*每个页面公共css */
 	@import '@/uni_modules/uni-scss/index.scss';
 	/* #ifndef APP-NVUE */
-	// 设置整个项目的背景色
 	page {
-		background-color: #f5f5f5;
+		background-color: #F6F7F9;
 	}
-
+	:root {
+		--primary-color: #00C853;
+		--secondary-color: #E8F5E9;
+		--accent-color: #FF9800;
+		--card-radius: 24rpx;
+		--btn-radius: 50rpx;
+	}
 	/* #endif */
-	.example-info {
-		font-size: 14px;
-		color: #333;
-		padding: 10px;
-	}
 </style>
