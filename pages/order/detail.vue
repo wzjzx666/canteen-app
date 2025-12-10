@@ -41,7 +41,7 @@
       </view>
     </view>
     
-    <view class="order-actions" v-if="order.status === 0">
+    <view class="order-actions" v-if="order.status === 0&& userInfo?.role !== 'admin'">
       <uv-button type="error" shape="circle" @click="confirmCancel">取消订单</uv-button>
     </view>
     
@@ -72,7 +72,7 @@ const order = ref({
 
 const modal = ref(null);
 const pendingOrderId = ref(null);
-
+const userInfo = ref(uni.getStorageSync('userInfo'));
 // 格式化时间
 const formatTime = (timestamp) => {
   const date = new Date(timestamp);

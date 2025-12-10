@@ -6,7 +6,7 @@
       lineColor="#00C853"
       activeStyle="color:#00C853;font-weight:600;"
       @change="onTabChange"
-    />
+    />  
 
     <view class="orders">
       <view v-for="order in orders" :key="order.id" class="order-card" @click="goToDetail(order.id)">
@@ -25,7 +25,7 @@
         <view class="footer">
           <view class="total">合计：¥{{ order.totalPrice.toFixed(2) }}</view>
           <uv-button
-            v-if="order.status === 0"
+            v-if="order.status === 0 && userInfo?.role !== 'admin'"
             size="mini"
             type="error"
             shape="circle"
@@ -57,6 +57,7 @@ const tabList = [
   { name: '已完成', value: 1 },
   { name: '已取消', value: 2 },
 ];
+const userInfo = ref(uni.getStorageSync('userInfo'));
 const modal = ref(null);
 const currentTab = ref(0);
 const orders = ref([]);
@@ -171,4 +172,3 @@ onMounted(loadOrders);
   color: #ff9800;
 }
 </style>
-
