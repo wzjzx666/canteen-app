@@ -38,11 +38,11 @@
     </view>
 
     <uv-modal
-      :show="showModal"
-      title="确认取消"
+      ref="modal"
+      title="确认取消" showCancelButton
       content="确认要取消该订单吗？"
       @confirm="handleCancel"
-      @close="showModal = false"
+      @cancel="cancel"
     />
   </view>
 </template>
@@ -57,10 +57,9 @@ const tabList = [
   { name: '已完成', value: 1 },
   { name: '已取消', value: 2 },
 ];
-
+const modal = ref(null);
 const currentTab = ref(0);
 const orders = ref([]);
-const showModal = ref(false);
 const pendingOrderId = ref(null);
 
 const loadOrders = async () => {
@@ -78,17 +77,21 @@ const statusClass = (status) => ['pending', 'success', 'cancel'][status] || '';
 
 const confirmCancel = (orderId) => {
   pendingOrderId.value = orderId;
-  showModal.value = true;
+  modal.value.open();
 };
 
 const handleCancel = async () => {
   if (!pendingOrderId.value) return;
   await cancelOrder(pendingOrderId.value);
   uni.showToast({ title: '取消成功', icon: 'success' });
-  showModal.value = false;
+  modal.value.close();
+  pendingOrderId.value = null;
   loadOrders();
 };
-
+const cancel = () => {
+  modal.value.close();
+  pendingOrderId.value = null;
+};
 onMounted(loadOrders);
 </script>
 
