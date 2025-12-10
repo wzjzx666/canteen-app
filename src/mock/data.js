@@ -47,6 +47,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1604908177883-1ec9b1f1f4d5?auto=format&w=800&q=60',
     sales: 320,
     description: '五花肉慢炖入味，搭配时蔬与米饭。',
+    onShelf: true, // 上架状态
   },
   {
     id: 1002,
@@ -58,6 +59,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&w=800&q=60',
     sales: 280,
     description: '番茄熬制，牛腩软烂多汁。',
+    onShelf: true,
   },
   {
     id: 1003,
@@ -69,6 +71,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&w=800&q=60',
     sales: 260,
     description: '椰香咖喱，微辣开胃。',
+    onShelf: true,
   },
   {
     id: 1004,
@@ -80,6 +83,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&w=800&q=60',
     sales: 190,
     description: '劲道刀削面，浓郁牛肉汤底。',
+    onShelf: true,
   },
   {
     id: 2001,
@@ -91,6 +95,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1604908177875-99c4b3b0782c?auto=format&w=800&q=60',
     sales: 410,
     description: '麻中带辣，荤素搭配，香气扑鼻。',
+    onShelf: true,
   },
   {
     id: 2002,
@@ -102,6 +107,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&w=800&q=60',
     sales: 220,
     description: '现炒现做，香辣爽口。',
+    onShelf: false,
   },
   {
     id: 3001,
@@ -113,6 +119,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1490642914619-7955af4c0f06?auto=format&w=800&q=60',
     sales: 150,
     description: '新疆风味抓饭，颗粒分明，肉香十足。',
+    onShelf: true,
   },
   {
     id: 3002,
@@ -124,6 +131,7 @@ export const dishes = [
       'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&w=800&q=60',
     sales: 500,
     description: '炭火直烤，孜然飘香，外焦里嫩。',
+    onShelf: true,
   },
 ];
 

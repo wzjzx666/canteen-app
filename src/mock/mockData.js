@@ -14,8 +14,12 @@ const withDelay = (data, timeout = 400) =>
 
 export const fetchCanteens = () => withDelay(canteens);
 
-export const fetchCategories = (canteenId) =>
-  withDelay(categories.filter((c) => c.canteenId === canteenId));
+export const fetchCategories = (canteenId) => {
+  if (canteenId) {
+    return withDelay(categories.filter((c) => c.canteenId === canteenId));
+  }
+  return withDelay(categories);
+};
 
 export const fetchDishesByCanteen = (canteenId) => {
   const targetCategoryIds = categories
@@ -62,5 +66,78 @@ export const deductDishStock = ({ dishId, count }) =>
         resolve({ success: false, stock: target ? target.stock : 0 });
       }
     }, 300);
+  });
+
+// 充值 API
+export const recharge = ({ amount, paymentMethod }) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      if (amount > 0) {
+        user.balance = (user.balance || 0) + amount;
+        resolve({ success: true, balance: user.balance });
+      } else {
+        resolve({ success: false, message: '充值金额无效' });
+      }
+    }, 800);
+  });
+
+// 管理端：获取所有菜品
+export const fetchAllDishes = () => withDelay(dishes);
+
+// 管理端：切换上架/下架
+export const toggleDishShelf = (dishId) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      const target = dishes.find((d) => d.id === dishId);
+      if (target) {
+        target.onShelf = !target.onShelf;
+        resolve({ success: true, onShelf: target.onShelf });
+      } else {
+        resolve({ success: false, message: '菜品不存在' });
+      }
+    }, 300);
+  });
+
+// 管理端：保存菜品（更新）
+export const saveDish = (dishId, data) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      const target = dishes.find((d) => d.id === dishId);
+      if (target) {
+        Object.assign(target, {
+          name: data.name,
+          categoryId: data.categoryId,
+          price: data.price,
+          stock: data.stock,
+          description: data.description,
+          image: data.image,
+          onShelf: data.onShelf !== false,
+        });
+        resolve({ success: true, dish: target });
+      } else {
+        resolve({ success: false, message: '菜品不存在' });
+      }
+    }, 400);
+  });
+
+// 管理端：创建菜品
+export const createDish = (data) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      const newId = Math.max(...dishes.map((d) => d.id), 0) + 1;
+      const newDish = {
+        id: newId,
+        name: data.name,
+        categoryId: data.categoryId,
+        price: data.price,
+        stock: data.stock,
+        description: data.description || '',
+        image: data.image || '',
+        sales: 0,
+        onShelf: data.onShelf !== false,
+      };
+      dishes.push(newDish);
+      resolve({ success: true, dish: newDish });
+    }, 400);
   });
 
