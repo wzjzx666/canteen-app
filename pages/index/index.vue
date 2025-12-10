@@ -158,7 +158,7 @@ onMounted(() => {
   background: #f6f7f9;
 }
 .location {
-  padding-top: 100rpx;
+  padding-top: 60rpx;
   display: flex;
   align-items: center;
   color: #fff;
@@ -172,6 +172,7 @@ onMounted(() => {
   align-items: center;
   gap: 16rpx;
   padding: 24rpx 6rpx 12rpx;
+  margin-top: 60rpx;
 }
 .search-input {
   flex: 1;
@@ -252,8 +253,11 @@ onMounted(() => {
   }
 }
 .navbar-title{
-  padding-top: 100rpx;
+  padding-top: 60rpx;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
+}
+:deep(.uv-navbar__content){
+  height:140rpx!important;
 }
 </style>

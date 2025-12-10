@@ -10,7 +10,7 @@
   background: #f6f7f9;
 }
 .location.data-v-1cf27b2a {
-  padding-top: 100rpx;
+  padding-top: 60rpx;
   display: flex;
   align-items: center;
   color: #fff;
@@ -24,6 +24,7 @@
   align-items: center;
   gap: 16rpx;
   padding: 24rpx 6rpx 12rpx;
+  margin-top: 60rpx;
 }
 .search-input.data-v-1cf27b2a {
   flex: 1;
@@ -104,7 +105,10 @@
   font-weight: 600;
 }
 .navbar-title.data-v-1cf27b2a {
-  padding-top: 100rpx;
+  padding-top: 60rpx;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
+}
+.data-v-1cf27b2a .uv-navbar__content {
+  height: 140rpx !important;
 }
