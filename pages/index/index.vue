@@ -109,7 +109,6 @@ const filteredCanteens = computed(() => {
 
 const buildBanner = async (canteenId) => {
   const dishes = await fetchDishesByCanteen(canteenId);
-  console.log(dishes);
   bannerList.value = dishes.slice(0, 4).map((d) => ({
     image: d.image,
     title: d.name,

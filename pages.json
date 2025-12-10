@@ -28,7 +28,7 @@
 		{
 			"path": "pages/order/list",
 			"style": {
-				"navigationBarTitleText": "我的订单",
+				"navigationBarTitleText": "全部订单",
 				"navigationBarBackgroundColor": "#00C853",
 				"navigationBarTextStyle": "white"
 			}
@@ -78,6 +78,30 @@
 				"navigationBarBackgroundColor": "#00C853",
 				"navigationBarTextStyle": "white"
 			}
+		},
+		{
+			"path": "pages/recharge/index",
+			"style": {
+				"navigationBarTitleText": "账户充值",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/admin/dish-list",
+			"style": {
+				"navigationBarTitleText": "菜品管理",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/admin/dish-edit",
+			"style": {
+				"navigationBarTitleText": "编辑菜品",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
 		}
 	],
 	"tabBar": {
@@ -88,15 +112,21 @@
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"text": "首页"
+				"text": "首页",
+				"iconPath": "/static/tabbar/home-nor.png",
+				"selectedIconPath": "/static/tabbar/home-pre.png"
 			},
 			{
 				"pagePath": "pages/order/list",
-				"text": "订单"
+				"text": "订单",
+				"iconPath": "/static/tabbar/order-nor.png",
+				"selectedIconPath": "static/tabbar/order-pre.png"
 			},
 			{
 				"pagePath": "pages/mine/index",
-				"text": "我的"
+				"text": "我的",
+				"iconPath": "/static/tabbar/mine-nor.png",
+				"selectedIconPath": "/static/tabbar/mine-pre.png"
 			}
 		]
 	},

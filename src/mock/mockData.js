@@ -3,6 +3,7 @@ import {
   categories,
   dishes,
   orders,
+  users,
   user,
   canteenMap,
 } from './data';
@@ -65,7 +66,17 @@ export const cancelOrder = (orderId) =>
     }, 450);
   });
 
-export const fetchUser = () => withDelay(user);
+// 根据角色获取用户信息
+export const fetchUser = () => {
+  // 获取存储的用户信息
+  const userInfo = uni.getStorageSync('userInfo');
+  // 根据角色返回对应的用户数据
+  if (userInfo && users[userInfo.role]) {
+    return withDelay(users[userInfo.role]);
+  }
+  // 默认返回学生用户
+  return withDelay(users.student);
+};
 
 export const deductDishStock = ({ dishId, count }) =>
   new Promise((resolve) => {
@@ -85,8 +96,11 @@ export const recharge = ({ amount, paymentMethod }) =>
   new Promise((resolve) => {
     setTimeout(() => {
       if (amount > 0) {
-        user.balance = (user.balance || 0) + amount;
-        resolve({ success: true, balance: user.balance });
+        // 获取当前用户角色
+        const userInfo = uni.getStorageSync('userInfo');
+        const currentUser = users[userInfo?.role] || users.student;
+        currentUser.balance = (currentUser.balance || 0) + amount;
+        resolve({ success: true, balance: currentUser.balance });
       } else {
         resolve({ success: false, message: '充值金额无效' });
       }
@@ -152,4 +166,3 @@ export const createDish = (data) =>
       resolve({ success: true, dish: newDish });
     }, 400);
   });
-

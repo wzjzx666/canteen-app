@@ -33,14 +33,14 @@
     <view class="payment-section">
       <view class="title">支付方式</view>
       <view class="payment-item">
-        <uni-icons type="wallet" color="#00C853" size="24"></uni-icons>
+        <uv-icon name="wallet" color="#00C853" size="24"></uv-icon>
         <text class="text">微信支付</text>
         <view class="radio" :class="{ checked: paymentMethod === 'wechat' }" @click="paymentMethod = 'wechat'">
           <view v-if="paymentMethod === 'wechat'" class="dot"></view>
         </view>
       </view>
       <view class="payment-item">
-        <uni-icons type="wallet" color="#00C853" size="24"></uni-icons>
+        <uv-icon name="wallet" color="#00C853" size="24"></uv-icon>
         <text class="text">支付宝</text>
         <view class="radio" :class="{ checked: paymentMethod === 'alipay' }" @click="paymentMethod = 'alipay'">
           <view v-if="paymentMethod === 'alipay'" class="dot"></view>
@@ -283,4 +283,3 @@ onMounted(() => {
   margin-top: 4rpx;
 }
 </style>
-

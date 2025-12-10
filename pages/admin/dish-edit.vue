@@ -53,7 +53,7 @@
             mode="aspectFill"
           />
           <view v-else class="upload-placeholder" @click="chooseImage">
-            <uni-icons type="camera" size="40" color="#ccc"></uni-icons>
+            <uv-icon name="camera" size="40" color="#ccc"></uv-icon>
             <text>点击上传</text>
           </view>
         </view>
@@ -275,4 +275,3 @@ onLoad(async (options) => {
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 </style>
-

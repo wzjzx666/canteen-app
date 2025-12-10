@@ -1,34 +1,47 @@
 <template>
   <view class="mine-page">
     <view class="header">
-      <uv-avatar :src="user?.avatar" size="70" />
+      <uv-avatar :src="currentUser?.avatar" size="70" />
       <view class="info">
-        <view class="name">{{ user?.name || '未登录' }}</view>
-        <view class="id">学号：{{ user?.studentId }}</view>
+        <view class="name">{{ displayName }}</view>
+        <view class="id" v-if="userInfo?.role === 'student'">学号：{{ currentUser?.studentId }}</view>
+        <view class="id" v-else-if="userInfo?.role === 'teacher'">工号：{{ currentUser?.studentId }}</view>
+        <view class="id" v-else>账号：{{ currentUser?.studentId }}</view>
       </view>
-      <view class="balance">
+      <view class="balance" v-if="userInfo?.role !== 'admin'">
         <text class="label">余额</text>
-        <text class="money">¥{{ user?.balance?.toFixed(2) }}</text>
+        <text class="money">¥{{ currentUser?.balance?.toFixed(2) }}</text>
       </view>
     </view>
 
     <uv-cell-group :border="false">
-      <uv-cell title="我的订单" isLink url="/pages/order/list" />
-      <uv-cell title="账户充值" isLink @click="goRecharge" />
+      <uv-cell title="全部订单" isLink @click="goToOrders" v-if="userInfo?.role === 'admin'" />
+      <uv-cell title="我的订单" isLink @click="goToOrders" v-else />
+      <uv-cell title="账户充值" isLink @click="goRecharge" v-if="userInfo?.role !== 'admin'" />
       <uv-cell v-if="userInfo?.role === 'admin'" title="食堂管理端" isLink @click="goAdmin" />
-      <uv-cell title="关于我们" isLink @click="aboutUs"/>
+      <uv-cell title="关于我们" isLink @click="aboutUs" />
       <uv-cell v-if="userInfo" title="退出登录" isLink @click="logout" />
     </uv-cell-group>
   </view>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const user = computed(() => store.state.user);
+const currentUser = computed(() => store.state.user);
 const userInfo = ref(uni.getStorageSync('userInfo'));
+
+// 根据角色显示不同的称呼
+const displayName = computed(() => {
+  if (!currentUser.value) return '未登录';
+  return currentUser.value.name;
+});
+
+const goToOrders = () => {
+  uni.switchTab({ url: '/pages/order/list' });
+};
 
 const goRecharge = () => {
   uni.navigateTo({ url: '/pages/recharge/index' });
@@ -37,6 +50,7 @@ const goRecharge = () => {
 const goAdmin = () => {
   uni.navigateTo({ url: '/pages/admin/dish-list' });
 };
+
 const aboutUs = () => {
   uni.navigateTo({ url: '/pages/aboutUs/index' });
 };
@@ -101,4 +115,3 @@ onMounted(() => {
   font-weight: 700;
 }
 </style>
-

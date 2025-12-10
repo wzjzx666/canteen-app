@@ -351,13 +351,33 @@ export const orders = [
   },
 ];
 
-export const user = {
-  name: '李同学',
-  studentId: '20230001',
-  balance: 128.5,
-  avatar:
-    'https://images.unsplash.com/photo-1502720705749-3c9255857623?auto=format&w=400&q=60',
+// 不同角色的用户数据
+export const users = {
+  student: {
+    name: '李同学',
+    studentId: '20230001',
+    balance: 128.5,
+    avatar:
+      'https://images.unsplash.com/photo-1502720705749-3c9255857623?auto=format&w=400&q=60',
+  },
+  teacher: {
+    name: '王老师',
+    studentId: '20231001',
+    balance: 256.0,
+    avatar:
+      'https://images.unsplash.com/photo-1502720705749-3c9255857623?auto=format&w=400&q=60',
+  },
+  admin: {
+    name: '张管理员',
+    studentId: 'ADM001',
+    balance: 0,
+    avatar:
+      'https://images.unsplash.com/photo-1502720705749-3c9255857623?auto=format&w=400&q=60',
+  }
 };
+
+// 当前默认用户（可以根据登录信息动态设置）
+export const user = users.student;
 
 // 简单映射，便于订单展示读取食堂信息
 export const canteenMap = canteens.reduce((acc, cur) => {
