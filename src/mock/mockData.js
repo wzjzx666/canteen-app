@@ -44,6 +44,18 @@ export const fetchOrders = (status = -1) => {
   );
 };
 
+export const fetchOrderDetail = (orderId) => {
+  const order = orders.find((o) => o.id === orderId);
+  if (order) {
+    return withDelay({
+      ...order,
+      canteen: canteenMap[order.canteenId],
+      createTime: Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000) // 随机生成近一周内的下单时间
+    });
+  }
+  return withDelay(null);
+};
+
 export const cancelOrder = (orderId) =>
   new Promise((resolve) => {
     setTimeout(() => {

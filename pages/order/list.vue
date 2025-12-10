@@ -9,7 +9,7 @@
     />
 
     <view class="orders">
-      <view v-for="order in orders" :key="order.id" class="order-card">
+      <view v-for="order in orders" :key="order.id" class="order-card" @click="goToDetail(order.id)">
         <view class="card-header">
           <text class="order-id">#{{ order.id }}</text>
           <text :class="['status', statusClass(order.status)]">{{ statusText(order.status) }}</text>
@@ -29,7 +29,7 @@
             size="mini"
             type="error"
             shape="circle"
-            @click="confirmCancel(order.id)"
+            @click.stop="confirmCancel(order.id)"
           >
             取消订单
           </uv-button>
@@ -79,7 +79,11 @@ const confirmCancel = (orderId) => {
   pendingOrderId.value = orderId;
   modal.value.open();
 };
-
+const goToDetail = (orderId) => {
+  uni.navigateTo({
+    url: `/pages/order/detail?id=${orderId}`
+  });
+};
 const handleCancel = async () => {
   if (!pendingOrderId.value) return;
   await cancelOrder(pendingOrderId.value);
