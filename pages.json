@@ -40,6 +40,20 @@
 				"navigationBarBackgroundColor": "#00C853",
 				"navigationBarTextStyle": "white"
 			}
+		},{
+			"path": "pages/aboutUs/index",
+			"style": {
+				"navigationBarTitleText": "关于我们",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
+		},{
+			"path": "pages/privacy/index",
+			"style": {
+				"navigationBarTitleText": "隐私政策",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
 		}
 	],
 	"tabBar": {

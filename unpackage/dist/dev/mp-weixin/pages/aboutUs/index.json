@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "关于我们",
+  "navigationBarBackgroundColor": "#00C853",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
+    "uni-icons": "../../uni_modules/uni-icons/components/uni-icons/uni-icons"
+  }
+}

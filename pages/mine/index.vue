@@ -16,8 +16,8 @@
       <uv-cell title="我的订单" isLink url="/pages/order/list" />
       <uv-cell title="账户充值" isLink @click="goRecharge" />
       <uv-cell title="食堂管理端" isLink @click="goAdmin" />
-      <uv-cell title="账号管理" isLink />
-      <uv-cell title="关于我们" isLink />
+      <uv-cell title="账号管理" isLink @click="goAdmin" />
+      <uv-cell title="关于我们" isLink @click="aboutUs"/>
     </uv-cell-group>
   </view>
 </template>
@@ -36,7 +36,9 @@ const goRecharge = () => {
 const goAdmin = () => {
   uni.navigateTo({ url: '/pages/admin/dish-list' });
 };
-
+const aboutUs = () => {
+  uni.navigateTo({ url: '/pages/aboutUs/index' });
+};
 onMounted(() => {
   store.dispatch('loadUser');
 });

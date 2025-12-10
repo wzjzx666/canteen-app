@@ -23,6 +23,9 @@ const _sfc_main = {
     const goAdmin = () => {
       common_vendor.index.navigateTo({ url: "/pages/admin/dish-list" });
     };
+    const aboutUs = () => {
+      common_vendor.index.navigateTo({ url: "/pages/aboutUs/index" });
+    };
     common_vendor.onMounted(() => {
       store.dispatch("loadUser");
     });
@@ -51,15 +54,17 @@ const _sfc_main = {
           title: "食堂管理端",
           isLink: true
         }),
-        j: common_vendor.p({
+        j: common_vendor.o(goAdmin),
+        k: common_vendor.p({
           title: "账号管理",
           isLink: true
         }),
-        k: common_vendor.p({
+        l: common_vendor.o(aboutUs),
+        m: common_vendor.p({
           title: "关于我们",
           isLink: true
         }),
-        l: common_vendor.p({
+        n: common_vendor.p({
           border: false
         })
       };
