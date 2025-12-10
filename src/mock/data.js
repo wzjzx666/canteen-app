@@ -92,7 +92,7 @@ export const dishes = [
     price: 24.5,
     stock: 40,
     image:
-      'https://images.pexels.com/photos/2931286/pexels-photo-2931286.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/1234567/pexels-photo-1234567.jpeg?auto=compress&cs=tinysrgb&w=1200',
     sales: 410,
     description: '麻中带辣，荤素搭配，香气扑鼻。',
     onShelf: true,
@@ -110,16 +110,15 @@ export const dishes = [
     onShelf: false,
   },
   {
-    id: 3001,
-    categoryId: 301,
-    name: '清真牛肉抓饭',
-    price: 25.0,
-    stock: 34,
-    image:
-      'https://images.unsplash.com/photo-1490642914619-7955af4c0f06?auto=format&w=800&q=60',
-    sales: 150,
-    description: '新疆风味抓饭，颗粒分明，肉香十足。',
-    onShelf: true,
+    "id": 3001,
+    "categoryId": 301,
+    "name": "清真牛肉抓饭",
+    "price": 25.0,
+    "stock": 34,
+    "image": "https://qcloud.dpfile.com/pc/9ra4bF5NkCm5F2NcDPHoHwSRzALUWXpLi6fO30jxyVKetTJPCukyTGns-vo8-MYZ.jpg",
+    "sales": 150,
+    "description": "新疆风味抓饭，颗粒分明，肉香十足。",
+    "onShelf": true
   },
   {
     id: 3002,

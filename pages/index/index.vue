@@ -158,6 +158,7 @@ onMounted(() => {
   background: #f6f7f9;
 }
 .location {
+  padding-top: 100rpx;
   display: flex;
   align-items: center;
   color: #fff;
@@ -249,5 +250,10 @@ onMounted(() => {
     color: #ff9800;
     font-weight: 600;
   }
+}
+.navbar-title{
+  padding-top: 100rpx;
+  color: #fff;
+  font-size: 16px;
 }
 </style>

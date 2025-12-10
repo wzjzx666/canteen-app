@@ -10,6 +10,7 @@
   background: #f6f7f9;
 }
 .location.data-v-1cf27b2a {
+  padding-top: 100rpx;
   display: flex;
   align-items: center;
   color: #fff;
@@ -101,4 +102,9 @@
 .canteen-info .rating-score.data-v-1cf27b2a {
   color: #ff9800;
   font-weight: 600;
+}
+.navbar-title.data-v-1cf27b2a {
+  padding-top: 100rpx;
+  color: #fff;
+  font-size: 16px;
 }
