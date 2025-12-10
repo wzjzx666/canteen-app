@@ -7,6 +7,10 @@
       bgColor="#00C853"
       titleStyle="color:#fff;font-weight:600;"
     >
+    <template #left>{{  }}</template>
+    <template #center>
+      <view class="navbar-title">智慧食堂</view>
+    </template>
       <template #right>
         <view class="location" @click="onLocate">
           <uni-icons type="location-filled" color="#fff" size="20"></uni-icons>
@@ -41,7 +45,7 @@
 
     <view class="card notice-card">
       <uv-notice-bar
-        :list="notices"
+        :text="notices.join(' ')"
         mode="horizontal"
         color="#00C853"
         bgColor="#E8F5E9"
@@ -100,14 +104,15 @@ const filteredCanteens = computed(() => {
   );
 });
 
-const buildBanner = async (canteenId = 1) => {
+const buildBanner = async (canteenId) => {
   const dishes = await fetchDishesByCanteen(canteenId);
-  const mapped = dishes.slice(0, 4).map((d) => ({
+  console.log(dishes);
+  bannerList.value = dishes.slice(0, 4).map((d) => ({
     image: d.image,
     title: d.name,
   }));
-  if (mapped.length) bannerList.value = mapped;
 };
+
 
 const loadCanteens = async () => {
   const list = await fetchCanteens();
@@ -123,15 +128,24 @@ const goCanteen = (canteen) => {
 
 const goSearch = () => {
   if (filteredCanteens.value.length > 0) {
-    goCanteen(filteredCanteens.value[0]);
+    uni.navigateTo({
+      url: `/pages/search/result?keyword=${searchKeyword.value}`,
+    });
   } else {
     uni.showToast({ title: '暂无匹配食堂', icon: 'none' });
   }
 };
 
-const onLocate = () => {
-  uni.showToast({ title: '已定位校园', icon: 'none' });
+
+const onLocate = async () => {
+  try {
+    const res = await uni.getLocation();
+    location.value = `经度: ${res.longitude}, 纬度: ${res.latitude}`;
+  } catch (error) {
+    uni.showToast({ title: '定位失败', icon: 'none' });
+  }
 };
+
 
 onMounted(() => {
   loadCanteens();

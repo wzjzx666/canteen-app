@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/canteen/detail",
+    "pages/dish/detail",
+    "pages/order/list",
+    "pages/mine/index"
+  ],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "智慧食堂",
+    "navigationBarBackgroundColor": "#00C853",
+    "backgroundColor": "#F6F7F9"
+  },
+  "tabBar": {
+    "color": "#8c8c8c",
+    "selectedColor": "#00C853",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/order/list",
+        "text": "订单"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

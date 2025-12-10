@@ -44,7 +44,7 @@ export const dishes = [
     price: 18.5,
     stock: 36,
     image:
-      'https://images.unsplash.com/photo-1604908177883-1ec9b1f1f4d5?auto=format&w=800&q=60',
+      'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=1200',
     sales: 320,
     description: '五花肉慢炖入味，搭配时蔬与米饭。',
     onShelf: true, // 上架状态
@@ -92,7 +92,7 @@ export const dishes = [
     price: 24.5,
     stock: 40,
     image:
-      'https://images.unsplash.com/photo-1604908177875-99c4b3b0782c?auto=format&w=800&q=60',
+      'https://images.pexels.com/photos/2931286/pexels-photo-2931286.jpeg?auto=compress&cs=tinysrgb&w=1200',
     sales: 410,
     description: '麻中带辣，荤素搭配，香气扑鼻。',
     onShelf: true,
@@ -175,4 +175,3 @@ export const canteenMap = canteens.reduce((acc, cur) => {
   acc[cur.id] = cur;
   return acc;
 }, {});
-
