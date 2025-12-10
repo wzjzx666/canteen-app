@@ -15,19 +15,20 @@
     <uv-cell-group :border="false">
       <uv-cell title="我的订单" isLink url="/pages/order/list" />
       <uv-cell title="账户充值" isLink @click="goRecharge" />
-      <uv-cell title="食堂管理端" isLink @click="goAdmin" />
-      <uv-cell title="账号管理" isLink @click="goAdmin" />
+      <uv-cell v-if="userInfo?.role === 'admin'" title="食堂管理端" isLink @click="goAdmin" />
       <uv-cell title="关于我们" isLink @click="aboutUs"/>
+      <uv-cell v-if="userInfo" title="退出登录" isLink @click="logout" />
     </uv-cell-group>
   </view>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 const user = computed(() => store.state.user);
+const userInfo = ref(uni.getStorageSync('userInfo'));
 
 const goRecharge = () => {
   uni.navigateTo({ url: '/pages/recharge/index' });
@@ -39,6 +40,26 @@ const goAdmin = () => {
 const aboutUs = () => {
   uni.navigateTo({ url: '/pages/aboutUs/index' });
 };
+
+const logout = () => {
+  uni.showModal({
+    title: '提示',
+    content: '确定要退出登录吗？',
+    success: function (res) {
+      if (res.confirm) {
+        // 清除用户信息
+        uni.removeStorageSync('userInfo');
+        userInfo.value = null;
+        
+        // 跳转到登录页面
+        uni.redirectTo({
+          url: '/pages/account/login'
+        });
+      }
+    }
+  });
+};
+
 onMounted(() => {
   store.dispatch('loadUser');
 });

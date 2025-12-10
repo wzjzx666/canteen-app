@@ -62,6 +62,22 @@
 				"navigationBarBackgroundColor": "#00C853",
 				"navigationBarTextStyle": "white"
 			}
+		},
+		{
+			"path": "pages/account/login",
+			"style": {
+				"navigationBarTitleText": "用户登录",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/account/register",
+			"style": {
+				"navigationBarTitleText": "用户注册",
+				"navigationBarBackgroundColor": "#00C853",
+				"navigationBarTextStyle": "white"
+			}
 		}
 	],
 	"tabBar": {

@@ -6,6 +6,14 @@
 		},
 		onShow: function() {
 			console.log('App Show')
+			// 检查用户登录状态
+			const userInfo = uni.getStorageSync('userInfo');
+			if (!userInfo) {
+				// 如果未登录，跳转到登录页面
+				uni.redirectTo({
+					url: '/pages/account/login'
+				});
+			}
 		},
 		onHide: function() {
 			console.log('App Hide')

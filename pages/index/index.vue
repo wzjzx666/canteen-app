@@ -97,6 +97,9 @@ const bannerList = ref([
 ]);
 const notices = ref(['今日特供：红烧肉盖饭限时 8 折', '新品上架：孜然羊肉串', '充值满 100 送 10 元']);
 
+// 获取用户信息
+const userInfo = uni.getStorageSync('userInfo');
+
 const filteredCanteens = computed(() => {
   if (!searchKeyword.value) return canteenList.value;
   return canteenList.value.filter((c) =>
@@ -148,6 +151,16 @@ const onLocate = async () => {
 
 
 onMounted(() => {
+  // 检查用户是否已登录
+  const userInfo = uni.getStorageSync('userInfo');
+  if (!userInfo) {
+    // 如果未登录，跳转到登录页面
+    uni.redirectTo({
+      url: '/pages/account/login'
+    });
+    return;
+  }
+  
   loadCanteens();
 });
 </script>
