@@ -1,0 +1,1 @@
+<view class="content"><map id="map" class="map" show-location="{{true}}" latitude="{{a}}" longitude="{{b}}" bindmarkertap="{{c}}"></map></view>

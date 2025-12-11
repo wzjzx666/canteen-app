@@ -6,7 +6,14 @@
     "pages/order/list",
     "pages/mine/index",
     "pages/aboutUs/index",
-    "pages/privacy/index"
+    "pages/privacy/index",
+    "pages/order/detail",
+    "pages/account/login",
+    "pages/account/register",
+    "pages/recharge/index",
+    "pages/admin/dish-list",
+    "pages/admin/dish-edit",
+    "pages/map/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -22,15 +29,21 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "/static/tabbar/home-nor.png",
+        "selectedIconPath": "/static/tabbar/home-pre.png"
       },
       {
         "pagePath": "pages/order/list",
-        "text": "订单"
+        "text": "订单",
+        "iconPath": "/static/tabbar/order-nor.png",
+        "selectedIconPath": "static/tabbar/order-pre.png"
       },
       {
         "pagePath": "pages/mine/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "/static/tabbar/mine-nor.png",
+        "selectedIconPath": "/static/tabbar/mine-pre.png"
       }
     ]
   },

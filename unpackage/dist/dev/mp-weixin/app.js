@@ -10,6 +10,13 @@ if (!Math) {
   "./pages/mine/index.js";
   "./pages/aboutUs/index.js";
   "./pages/privacy/index.js";
+  "./pages/order/detail.js";
+  "./pages/account/login.js";
+  "./pages/account/register.js";
+  "./pages/recharge/index.js";
+  "./pages/admin/dish-list.js";
+  "./pages/admin/dish-edit.js";
+  "./pages/map/index.js";
 }
 const _sfc_main = {
   onLaunch: function() {
@@ -18,6 +25,12 @@ const _sfc_main = {
   },
   onShow: function() {
     console.log("App Show");
+    const userInfo = common_vendor.index.getStorageSync("userInfo");
+    if (!userInfo) {
+      common_vendor.index.redirectTo({
+        url: "/pages/account/login"
+      });
+    }
   },
   onHide: function() {
     console.log("App Hide");

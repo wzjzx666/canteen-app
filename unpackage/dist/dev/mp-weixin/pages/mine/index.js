@@ -16,7 +16,16 @@ const _sfc_main = {
   __name: "index",
   setup(__props) {
     const store = common_vendor.useStore();
-    const user = common_vendor.computed(() => store.state.user);
+    const currentUser = common_vendor.computed(() => store.state.user);
+    const userInfo = common_vendor.ref(common_vendor.index.getStorageSync("userInfo"));
+    const displayName = common_vendor.computed(() => {
+      if (!currentUser.value)
+        return "未登录";
+      return currentUser.value.name;
+    });
+    const goToOrders = () => {
+      common_vendor.index.switchTab({ url: "/pages/order/list" });
+    };
     const goRecharge = () => {
       common_vendor.index.navigateTo({ url: "/pages/recharge/index" });
     };
@@ -26,48 +35,92 @@ const _sfc_main = {
     const aboutUs = () => {
       common_vendor.index.navigateTo({ url: "/pages/aboutUs/index" });
     };
+    const logout = () => {
+      common_vendor.index.showModal({
+        title: "提示",
+        content: "确定要退出登录吗？",
+        success: function(res) {
+          if (res.confirm) {
+            common_vendor.index.removeStorageSync("userInfo");
+            userInfo.value = null;
+            common_vendor.index.redirectTo({
+              url: "/pages/account/login"
+            });
+          }
+        }
+      });
+    };
     common_vendor.onMounted(() => {
       store.dispatch("loadUser");
     });
     return (_ctx, _cache) => {
-      var _a, _b, _c, _d, _e;
-      return {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
+      return common_vendor.e({
         a: common_vendor.p({
-          src: (_a = user.value) == null ? void 0 : _a.avatar,
+          src: (_a = currentUser.value) == null ? void 0 : _a.avatar,
           size: "70"
         }),
-        b: common_vendor.t(((_b = user.value) == null ? void 0 : _b.name) || "未登录"),
-        c: common_vendor.t((_c = user.value) == null ? void 0 : _c.studentId),
-        d: common_vendor.t((_e = (_d = user.value) == null ? void 0 : _d.balance) == null ? void 0 : _e.toFixed(2)),
-        e: common_vendor.p({
+        b: common_vendor.t(displayName.value),
+        c: ((_b = userInfo.value) == null ? void 0 : _b.role) === "student"
+      }, ((_c = userInfo.value) == null ? void 0 : _c.role) === "student" ? {
+        d: common_vendor.t((_d = currentUser.value) == null ? void 0 : _d.studentId)
+      } : ((_e = userInfo.value) == null ? void 0 : _e.role) === "teacher" ? {
+        f: common_vendor.t((_f = currentUser.value) == null ? void 0 : _f.studentId)
+      } : {
+        g: common_vendor.t((_g = currentUser.value) == null ? void 0 : _g.studentId)
+      }, {
+        e: ((_h = userInfo.value) == null ? void 0 : _h.role) === "teacher",
+        h: ((_i = userInfo.value) == null ? void 0 : _i.role) !== "admin"
+      }, ((_j = userInfo.value) == null ? void 0 : _j.role) !== "admin" ? {
+        i: common_vendor.t((_l = (_k = currentUser.value) == null ? void 0 : _k.balance) == null ? void 0 : _l.toFixed(2))
+      } : {}, {
+        j: ((_m = userInfo.value) == null ? void 0 : _m.role) === "admin"
+      }, ((_n = userInfo.value) == null ? void 0 : _n.role) === "admin" ? {
+        k: common_vendor.o(goToOrders),
+        l: common_vendor.p({
+          title: "全部订单",
+          isLink: true
+        })
+      } : {
+        m: common_vendor.o(goToOrders),
+        n: common_vendor.p({
           title: "我的订单",
-          isLink: true,
-          url: "/pages/order/list"
-        }),
-        f: common_vendor.o(goRecharge),
-        g: common_vendor.p({
+          isLink: true
+        })
+      }, {
+        o: ((_o = userInfo.value) == null ? void 0 : _o.role) !== "admin"
+      }, ((_p = userInfo.value) == null ? void 0 : _p.role) !== "admin" ? {
+        p: common_vendor.o(goRecharge),
+        q: common_vendor.p({
           title: "账户充值",
           isLink: true
-        }),
-        h: common_vendor.o(goAdmin),
-        i: common_vendor.p({
+        })
+      } : {}, {
+        r: ((_q = userInfo.value) == null ? void 0 : _q.role) === "admin"
+      }, ((_r = userInfo.value) == null ? void 0 : _r.role) === "admin" ? {
+        s: common_vendor.o(goAdmin),
+        t: common_vendor.p({
           title: "食堂管理端",
           isLink: true
-        }),
-        j: common_vendor.o(goAdmin),
-        k: common_vendor.p({
-          title: "账号管理",
-          isLink: true
-        }),
-        l: common_vendor.o(aboutUs),
-        m: common_vendor.p({
+        })
+      } : {}, {
+        v: common_vendor.o(aboutUs),
+        w: common_vendor.p({
           title: "关于我们",
           isLink: true
         }),
-        n: common_vendor.p({
+        x: userInfo.value
+      }, userInfo.value ? {
+        y: common_vendor.o(logout),
+        z: common_vendor.p({
+          title: "退出登录",
+          isLink: true
+        })
+      } : {}, {
+        A: common_vendor.p({
           border: false
         })
-      };
+      });
     };
   }
 };

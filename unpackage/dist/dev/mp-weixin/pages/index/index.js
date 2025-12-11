@@ -34,6 +34,7 @@ const _sfc_main = {
       }
     ]);
     const notices = common_vendor.ref(["今日特供：红烧肉盖饭限时 8 折", "新品上架：孜然羊肉串", "充值满 100 送 10 元"]);
+    common_vendor.index.getStorageSync("userInfo");
     const filteredCanteens = common_vendor.computed(() => {
       if (!searchKeyword.value)
         return canteenList.value;
@@ -43,7 +44,6 @@ const _sfc_main = {
     });
     const buildBanner = async (canteenId) => {
       const dishes = await src_mock_mockData.fetchDishesByCanteen(canteenId);
-      console.log(dishes);
       bannerList.value = dishes.slice(0, 4).map((d) => ({
         image: d.image,
         title: d.name
@@ -70,14 +70,18 @@ const _sfc_main = {
       }
     };
     const onLocate = async () => {
-      try {
-        const res = await common_vendor.index.getLocation();
-        location.value = `经度: ${res.longitude}, 纬度: ${res.latitude}`;
-      } catch (error) {
-        common_vendor.index.showToast({ title: "定位失败", icon: "none" });
-      }
+      common_vendor.index.navigateTo({
+        url: "/pages/map/index"
+      });
     };
     common_vendor.onMounted(() => {
+      const userInfo = common_vendor.index.getStorageSync("userInfo");
+      if (!userInfo) {
+        common_vendor.index.redirectTo({
+          url: "/pages/account/login"
+        });
+        return;
+      }
       loadCanteens();
     });
     return (_ctx, _cache) => {

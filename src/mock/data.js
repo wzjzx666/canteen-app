@@ -3,6 +3,8 @@ export const canteens = [
   {
     id: 1,
     name: '北苑食堂',
+    latitude: 23.1015,
+    longitude: 113.3240,
     location: '北区教学楼旁',
     image:
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&w=1200&q=60',
@@ -11,6 +13,8 @@ export const canteens = [
   {
     id: 2,
     name: '南苑食堂',
+    latitude: 23.0985,
+    longitude: 113.3240,
     location: '图书馆对面',
     image:
       'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&w=1200&q=60',
@@ -19,6 +23,8 @@ export const canteens = [
   {
     id: 3,
     name: '东苑清真餐厅',
+    latitude: 23.0995,
+    longitude: 113.3260,
     location: '体育馆东侧',
     image:
       'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&w=1200&q=60',
@@ -27,6 +33,8 @@ export const canteens = [
   {
     id: 4,
     name: '西苑美食广场',
+    latitude: 23.0995,
+    longitude: 113.3225,
     location: '学生公寓西侧',
     image:
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&w=1200&q=60',

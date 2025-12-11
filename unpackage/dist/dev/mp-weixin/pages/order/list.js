@@ -22,9 +22,10 @@ const _sfc_main = {
       { name: "已完成", value: 1 },
       { name: "已取消", value: 2 }
     ];
+    const userInfo = common_vendor.ref(common_vendor.index.getStorageSync("userInfo"));
+    const modal = common_vendor.ref(null);
     const currentTab = common_vendor.ref(0);
     const orders = common_vendor.ref([]);
-    const showModal = common_vendor.ref(false);
     const pendingOrderId = common_vendor.ref(null);
     const loadOrders = async () => {
       const status = tabList[currentTab.value].value;
@@ -38,15 +39,25 @@ const _sfc_main = {
     const statusClass = (status) => ["pending", "success", "cancel"][status] || "";
     const confirmCancel = (orderId) => {
       pendingOrderId.value = orderId;
-      showModal.value = true;
+      modal.value.open();
+    };
+    const goToDetail = (orderId) => {
+      common_vendor.index.navigateTo({
+        url: `/pages/order/detail?id=${orderId}`
+      });
     };
     const handleCancel = async () => {
       if (!pendingOrderId.value)
         return;
       await src_mock_mockData.cancelOrder(pendingOrderId.value);
       common_vendor.index.showToast({ title: "取消成功", icon: "success" });
-      showModal.value = false;
+      modal.value.close();
+      pendingOrderId.value = null;
       loadOrders();
+    };
+    const cancel = () => {
+      modal.value.close();
+      pendingOrderId.value = null;
     };
     common_vendor.onMounted(loadOrders);
     return (_ctx, _cache) => {
@@ -59,7 +70,7 @@ const _sfc_main = {
           activeStyle: "color:#00C853;font-weight:600;"
         }),
         c: common_vendor.f(orders.value, (order, k0, i0) => {
-          var _a;
+          var _a, _b, _c;
           return common_vendor.e({
             a: common_vendor.t(order.id),
             b: common_vendor.t(statusText(order.status)),
@@ -74,8 +85,8 @@ const _sfc_main = {
               };
             }),
             f: common_vendor.t(order.totalPrice.toFixed(2)),
-            g: order.status === 0
-          }, order.status === 0 ? {
+            g: order.status === 0 && ((_b = userInfo.value) == null ? void 0 : _b.role) !== "admin"
+          }, order.status === 0 && ((_c = userInfo.value) == null ? void 0 : _c.role) !== "admin" ? {
             h: common_vendor.o(($event) => confirmCancel(order.id), order.id),
             i: "456ecf67-1-" + i0,
             j: common_vendor.p({
@@ -84,14 +95,18 @@ const _sfc_main = {
               shape: "circle"
             })
           } : {}, {
-            k: order.id
+            k: order.id,
+            l: common_vendor.o(($event) => goToDetail(order.id), order.id)
           });
         }),
-        d: common_vendor.o(handleCancel),
-        e: common_vendor.o(($event) => showModal.value = false),
-        f: common_vendor.p({
-          show: showModal.value,
+        d: common_vendor.sr(modal, "456ecf67-2", {
+          "k": "modal"
+        }),
+        e: common_vendor.o(handleCancel),
+        f: common_vendor.o(cancel),
+        g: common_vendor.p({
           title: "确认取消",
+          showCancelButton: true,
           content: "确认要取消该订单吗？"
         })
       };

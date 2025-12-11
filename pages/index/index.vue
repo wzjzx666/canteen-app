@@ -140,12 +140,9 @@ const goSearch = () => {
 
 
 const onLocate = async () => {
-  try {
-    const res = await uni.getLocation();
-    location.value = `经度: ${res.longitude}, 纬度: ${res.latitude}`;
-  } catch (error) {
-    uni.showToast({ title: '定位失败', icon: 'none' });
-  }
+  uni.navigateTo({
+    url: '/pages/map/index'
+  })
 };
 
 
