@@ -118,14 +118,14 @@ const buildBanner = async (canteenId) => {
 
 const loadCanteens = async () => {
   
-  const result = await this.$api.get('/api/canteens');
-      if (result.success) {
-        canteenList.value = result.data;
-      } else {
+  // const result = await this.$api.get('/api/canteens');
+  //     if (result.success) {
+  //       canteenList.value = result.data;
+  //     } else {
         const list = await fetchCanteens();
         canteenList.value = list;
         buildBanner(list[0]?.id || 1);
-      }
+      // }
 };
 
 const goCanteen = (canteen) => {
