@@ -50,10 +50,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive,getCurrentInstance } from 'vue';
 const formRef = ref(null);
 const loading = ref(false);
-
+const { proxy } = getCurrentInstance();
 const form = reactive({
   username: '',
   password: '',
@@ -70,44 +70,15 @@ const handleLogin = async () => {
   }
   
   loading.value = true;
-  
-  // 模拟登录请求
-  setTimeout(() => {
+  const res = await proxy.$api.login(form)
+  if (res.code == 200) {
+    uni.setStorageSync('userInfo', res.data);
     loading.value = false;
-    
-    // 保存用户信息到本地存储
-    const userInfo = {
-      username: form.username,
-      role: form.role,
-      loginTime: new Date().getTime()
-    };
-    
-    uni.setStorageSync('userInfo', userInfo);
-    
-    // 根据角色跳转到不同页面
-    switch (form.role) {
-      case 'student':
-      case 'teacher':
-        uni.switchTab({
-          url: '/pages/index/index'
-        });
-        break;
-      case 'admin':
-        uni.navigateTo({
-          url: '/pages/admin/dish-list'
-        });
-        break;
-      default:
-        uni.switchTab({
-          url: '/pages/index/index'
-        });
-    }
-    
     uni.showToast({
       title: '登录成功',
       icon: 'success'
     });
-  }, 800);
+  }
 };
 
 const goToRegister = () => {

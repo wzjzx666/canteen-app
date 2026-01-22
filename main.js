@@ -1,43 +1,28 @@
-
+import api from './api/index.js'
+import App from './App'
+import common from './api/common.js';
+import store from '/src/store'  
 // #ifndef VUE3
 import Vue from 'vue'
-import App from './App'
-
 Vue.config.productionTip = false
-// 全局封装请求方法
-Vue.prototype.$api = {
-  get: async (url, params = {}) => {
-    try {
-      const [err, res] = await uni.request({
-        url: `http://localhost:3000${ url }`,
-        method: 'GET',
-        data: params,
-      });
-      if (err) throw err;
-      return res.data;
-    } catch (err) {
-      console.error('API请求失败:', err);
-      return { success: false, error: err.message };
-    }
-  },
-};
-
 App.mpType = 'app'
-
 const app = new Vue({
-    ...App
+  ...App
 })
 app.$mount()
 // #endif
 
 // #ifdef VUE3
-import { createSSRApp } from 'vue'
-import App from './App.vue'
-import store from '/src/store'  
-
+import {
+  createSSRApp
+} from 'vue'
+// console.log('获取位置',getBackLocation.getAuthorise())
+// getBackLocation.getAuthorise()
 export function createApp() {
   const app = createSSRApp(App)
-  app.use(store)
+  app.use(store);
+  app.config.globalProperties.$api = api;
+  app.config.globalProperties.$common = common;
   return {
     app
   }
