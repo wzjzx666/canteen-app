@@ -59,12 +59,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance } from 'vue';
+import { ref, reactive } from 'vue';
 import md5 from 'js-md5';
+import { mockLogin } from '/src/mock/mockAuth';
 const formRef = ref(null);
 const loading = ref(false);
 const showPassword = ref(false);
-const { proxy } = getCurrentInstance();
 const form = reactive({
   username: '',
   password: '',
@@ -79,23 +79,38 @@ const handleLogin = async () => {
     });
     return;
   }
-  
+
   loading.value = true;
-  let rq = {
+  try {
+    const res = await mockLogin({
       username: form.username.trim(),
-					password: md5((form.password).trim()),
-					tenantId: '000000',
-					scope: 'all',
-					grant_type: 'password',
-  }
-  const res = await proxy.$api.login(rq)
-  if (res.code == 200) {
-    uni.setStorageSync('userInfo', res.data);
-    loading.value = false;
-    uni.showToast({
-      title: '登录成功',
-      icon: 'success'
+      password: md5((form.password).trim()),
+      role: form.role
     });
+    if (res.code === 200 && res.data) {
+      uni.setStorageSync('token', res.data.token);
+      uni.setStorageSync('userInfo', res.data.user);
+      uni.showToast({
+        title: res.msg || '登录成功',
+        icon: 'success'
+      });
+      uni.reLaunch({
+        url: '/pages/index/index'
+      });
+    } else {
+      uni.showToast({
+        title: res.error || '登录失败',
+        icon: 'none'
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    uni.showToast({
+      title: '登录异常，请稍后重试',
+      icon: 'none'
+    });
+  } finally {
+    loading.value = false;
   }
 };
 
