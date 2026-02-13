@@ -18,10 +18,19 @@
         <uv-form-item label="密码" prop="password">
           <uv-input 
             v-model="form.password" 
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             placeholder="请输入密码" 
             border="surround"
-          />
+          >
+            <template #suffix>
+              <uv-icon
+                :name="showPassword ? 'eye-fill' : 'eye-off'"
+                size="24"
+                color="#8c8c8c"
+                @tap="togglePasswordVisibility"
+              />
+            </template>
+          </uv-input>
         </uv-form-item>
         
         <uv-form-item label="角色" prop="role">
@@ -50,9 +59,11 @@
 </template>
 
 <script setup>
-import { ref, reactive,getCurrentInstance } from 'vue';
+import { ref, reactive, getCurrentInstance } from 'vue';
+import md5 from 'js-md5';
 const formRef = ref(null);
 const loading = ref(false);
+const showPassword = ref(false);
 const { proxy } = getCurrentInstance();
 const form = reactive({
   username: '',
@@ -70,7 +81,14 @@ const handleLogin = async () => {
   }
   
   loading.value = true;
-  const res = await proxy.$api.login(form)
+  let rq = {
+      username: form.username.trim(),
+					password: md5((form.password).trim()),
+					tenantId: '000000',
+					scope: 'all',
+					grant_type: 'password',
+  }
+  const res = await proxy.$api.login(rq)
   if (res.code == 200) {
     uni.setStorageSync('userInfo', res.data);
     loading.value = false;
@@ -85,6 +103,10 @@ const goToRegister = () => {
   uni.navigateTo({
     url: '/pages/account/register'
   });
+};
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
 };
 </script>
 
