@@ -1,5 +1,7 @@
+import { getCartItems, setCartItems } from '../utils/storage';
+
 const state = () => ({
-  cartItems: [],
+  cartItems: getCartItems(),
 });
 
 const getters = {
@@ -26,6 +28,7 @@ const mutations = {
         count: 1,
       });
     }
+    setCartItems(state.cartItems);
   },
   REMOVE_FROM_CART(state, dishId) {
     const target = state.cartItems.find((item) => item.dishId === dishId);
@@ -35,6 +38,7 @@ const mutations = {
         state.cartItems = state.cartItems.filter((item) => item.dishId !== dishId);
       }
     }
+    setCartItems(state.cartItems);
   },
   CLEAR_CART(state, canteenId = null) {
     if (canteenId) {
@@ -42,6 +46,7 @@ const mutations = {
     } else {
       state.cartItems = [];
     }
+    setCartItems(state.cartItems);
   },
   DEDUCT_STOCK(state, { dishId, count }) {
     const target = state.cartItems.find((item) => item.dishId === dishId);

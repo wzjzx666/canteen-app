@@ -1,19 +1,17 @@
 <script>
 	export default {
 		onLaunch: function() {
-			console.warn('当前组件仅支持 uni_modules 目录结构 ，请升级 HBuilderX 到 3.1.0 版本以上！')
 			console.log('App Launch')
-		},
-		onShow: function() {
-			console.log('App Show')
-			// 检查用户登录状态
+			// 检查用户登录状态，仅在启动时检查一次
 			const userInfo = uni.getStorageSync('userInfo');
 			if (!userInfo) {
-				// 如果未登录，跳转到登录页面
-				uni.redirectTo({
+				uni.navigateTo({
 					url: '/pages/account/login'
 				});
 			}
+		},
+		onShow: function() {
+			console.log('App Show')
 		},
 		onHide: function() {
 			console.log('App Hide')

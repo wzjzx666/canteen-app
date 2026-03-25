@@ -59,10 +59,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import md5 from 'js-md5';
-import { mockLogin } from '/src/mock/mockAuth';
-const formRef = ref(null);
+import { mockLogin } from '../../src/mock/mockAuth';
+
 const loading = ref(false);
 const showPassword = ref(false);
 const form = reactive({
@@ -90,6 +90,10 @@ const handleLogin = async () => {
     if (res.code === 200 && res.data) {
       uni.setStorageSync('token', res.data.token);
       uni.setStorageSync('userInfo', res.data.user);
+      uni.setStorageSync('lastLogin', {
+        username: form.username.trim(),
+        role: form.role
+      });
       uni.showToast({
         title: res.msg || '登录成功',
         icon: 'success'
@@ -113,6 +117,21 @@ const handleLogin = async () => {
     loading.value = false;
   }
 };
+
+onMounted(() => {
+  const userInfo = uni.getStorageSync('userInfo');
+  if (userInfo) {
+    uni.reLaunch({
+      url: '/pages/index/index'
+    });
+    return;
+  }
+  const lastLogin = uni.getStorageSync('lastLogin');
+  if (lastLogin) {
+    form.username = lastLogin.username || '';
+    form.role = lastLogin.role || 'student';
+  }
+});
 
 const goToRegister = () => {
   uni.navigateTo({

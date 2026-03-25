@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "菜品管理",
+  "navigationBarBackgroundColor": "#00C853",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "uv-image": "../../uni_modules/uv-image/components/uv-image/uv-image",
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"
+  }
+}

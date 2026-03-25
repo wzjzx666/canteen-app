@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "我的",
+  "navigationBarBackgroundColor": "#00C853",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "uv-avatar": "../../uni_modules/uv-avatar/components/uv-avatar/uv-avatar",
+    "uv-cell": "../../uni_modules/uv-cell/components/uv-cell/uv-cell",
+    "uv-cell-group": "../../uni_modules/uv-cell/components/uv-cell-group/uv-cell-group"
+  }
+}

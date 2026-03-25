@@ -62,7 +62,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { fetchCanteens, fetchAllDishes, fetchCategories, toggleDishShelf } from '/src/mock/mockData';
+import { fetchCanteens, fetchAllDishes, fetchCategories, toggleDishShelf } from '../../src/mock/mockData';
 
 const canteens = ref([]);
 const dishes = ref([]);

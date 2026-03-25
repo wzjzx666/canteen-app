@@ -1,7 +1,7 @@
 import api from './api/index.js'
 import App from './App'
 import common from './api/common.js';
-import store from '/src/store'  
+import store from './src/store'
 // #ifndef VUE3
 import Vue from 'vue'
 Vue.config.productionTip = false

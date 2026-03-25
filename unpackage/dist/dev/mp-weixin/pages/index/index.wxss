@@ -1,0 +1,114 @@
+/* 水平间距 */
+/* 水平间距 */
+.data-v-1cf27b2a:root {
+  --primary-color: #00C853;
+  --secondary-color: #E8F5E9;
+  --accent-color: #FF9800;
+}
+.index-page.data-v-1cf27b2a {
+  padding: 0 24rpx 40rpx;
+  background: #f6f7f9;
+}
+.location.data-v-1cf27b2a {
+  padding-top: 60rpx;
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+.location__text.data-v-1cf27b2a {
+  margin-left: 6rpx;
+  font-size: 26rpx;
+}
+.search-bar.data-v-1cf27b2a {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx 6rpx 12rpx;
+  margin-top: 60rpx;
+}
+.search-input.data-v-1cf27b2a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 12rpx 18rpx;
+  border-radius: 50rpx;
+}
+.search-input input.data-v-1cf27b2a {
+  flex: 1;
+  margin-left: 12rpx;
+  font-size: 28rpx;
+}
+.card.data-v-1cf27b2a {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 20rpx;
+}
+.banner-card.data-v-1cf27b2a {
+  padding: 0;
+  overflow: hidden;
+}
+.notice-card.data-v-1cf27b2a {
+  background: #e8f5e9;
+}
+.section.data-v-1cf27b2a {
+  margin-top: 12rpx;
+}
+.section__title.data-v-1cf27b2a {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+.canteen-list.data-v-1cf27b2a {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.canteen-card.data-v-1cf27b2a {
+  display: flex;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 18rpx;
+  gap: 18rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+}
+.canteen-info.data-v-1cf27b2a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.canteen-info .title.data-v-1cf27b2a {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #111;
+}
+.canteen-info .location-line.data-v-1cf27b2a {
+  display: flex;
+  align-items: center;
+  margin: 8rpx 0;
+}
+.canteen-info .location-text.data-v-1cf27b2a {
+  color: #666;
+  margin-left: 8rpx;
+  font-size: 26rpx;
+}
+.canteen-info .rating.data-v-1cf27b2a {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.canteen-info .rating-score.data-v-1cf27b2a {
+  color: #ff9800;
+  font-weight: 600;
+}
+.navbar-title.data-v-1cf27b2a {
+  padding-top: 60rpx;
+  color: #fff;
+  font-size: 15px;
+}
+.data-v-1cf27b2a .uv-navbar__content {
+  height: 140rpx !important;
+}

@@ -1,3 +1,4 @@
 {
-    "codingcopilot.enableCompletionLanguage": {}
+    "codingcopilot.enableCompletionLanguage": {},
+    "kiroAgent.configureMCP": "Disabled"
 }

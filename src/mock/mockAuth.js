@@ -1,6 +1,7 @@
-import Mock from '/src/utils/mockjs';
+import Mock from '../utils/mockjs';
 import md5 from 'js-md5';
 import { users } from './data';
+import { getLocalAccounts } from '../utils/storage';
 
 const accountTemplates = [
   {
@@ -37,9 +38,16 @@ const accounts = accountTemplates.map((item) => ({
 export const mockLogin = async ({ username, password, role }) =>
   new Promise((resolve) => {
     setTimeout(() => {
-      const match = accounts.find(
+      const localAccounts = getLocalAccounts() || [];
+      const allAccounts = [
+        ...localAccounts,
+        ...accounts,
+      ];
+
+      const match = allAccounts.find(
         (item) => item.username == username && item.role === role,
       );
+
       if (!match) {
         resolve({
           code: 404,

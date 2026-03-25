@@ -22,7 +22,7 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useStore } from 'vuex';
-import { fetchDishDetail } from '/src/mock/mockData';
+import { fetchDishDetail } from '../../src/mock/mockData';
 
 const dish = ref(null);
 const store = useStore();

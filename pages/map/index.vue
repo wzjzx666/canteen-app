@@ -5,7 +5,7 @@
   </template>
   
   <script>
-  import { canteens } from '/src/mock/data.js';
+  import { canteens } from '../../src/mock/data.js';
 
   const img = '/static/logo.png';
 

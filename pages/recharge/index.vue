@@ -68,7 +68,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { recharge } from '/src/mock/mockData';
+import { recharge } from '../../src/mock/mockData';
 
 const store = useStore();
 const user = computed(() => store.state.user);

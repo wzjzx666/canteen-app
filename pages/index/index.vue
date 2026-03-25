@@ -83,7 +83,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { fetchCanteens, fetchDishesByCanteen } from '/src/mock/mockData';
+import { fetchCanteens, fetchDishesByCanteen } from '../../src/mock/mockData';
 
 const location = ref('校园内');
 const searchKeyword = ref('');

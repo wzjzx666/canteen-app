@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import cart from './modules/cart';
-import { fetchUser } from '/src/mock/mockData';
+import { fetchUser } from '../mock/mockData';
 
 const store = createStore({
   state: () => ({

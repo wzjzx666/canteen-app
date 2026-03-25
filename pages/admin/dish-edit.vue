@@ -76,7 +76,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { fetchCategories, fetchDishDetail, saveDish, createDish } from '/src/mock/mockData';
+import { fetchCategories, fetchDishDetail, saveDish, createDish } from '../../src/mock/mockData';
 
 const dishId = ref(null);
 const categoryOptions = ref([]);

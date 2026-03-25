@@ -49,7 +49,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { fetchOrders, cancelOrder } from '/src/mock/mockData';
+import { fetchOrders, cancelOrder } from '../../src/mock/mockData';
 
 const tabList = [
   { name: '全部', value: -1 },

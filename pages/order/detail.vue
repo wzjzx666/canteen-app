@@ -12,6 +12,12 @@
       </view>
     </view>
     
+    <view class="pickup-card" v-if="order.pickupCode">
+      <view class="pickup-title">取餐码</view>
+      <view class="pickup-code">{{ order.pickupCode }}</view>
+      <text class="pickup-tip">请在取餐窗口出示取餐码</text>
+    </view>
+    
     <view class="order-items">
       <view class="section-title">订单菜品</view>
       <view class="item" v-for="item in order.items" :key="item.dishId">
@@ -41,8 +47,23 @@
       </view>
     </view>
     
-    <view class="order-actions" v-if="order.status === 0&& userInfo?.role !== 'admin'">
-      <uv-button type="error" shape="circle" @click="confirmCancel">取消订单</uv-button>
+    <view class="order-actions" v-if="userInfo?.role !== 'admin'">
+      <uv-button
+        v-if="!order.paid"
+        type="primary"
+        shape="circle"
+        @click="handlePay"
+      >
+        去支付
+      </uv-button>
+      <uv-button
+        v-if="order.status === 0"
+        type="error"
+        shape="circle"
+        @click="confirmCancel"
+      >
+        取消订单
+      </uv-button>
     </view>
     
     <uv-modal
@@ -57,9 +78,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { fetchOrderDetail, cancelOrder } from '/src/mock/mockData';
+import { fetchOrderDetail, cancelOrder, payOrder } from '../../src/mock/mockData';
 
 const order = ref({
   id: '',
@@ -67,7 +88,10 @@ const order = ref({
   items: [],
   totalPrice: 0,
   canteen: {},
-  createTime: Date.now()
+  createTime: Date.now(),
+  paid: false,
+  payType: null,
+  pickupCode: '',
 });
 
 const modal = ref(null);
@@ -94,6 +118,27 @@ const calculateSubtotal = () => {
   return order.value.items.reduce((sum, item) => {
     return sum + (item.price * item.count);
   }, 0);
+};
+
+// 支付订单
+const handlePay = async () => {
+  if (!order.value.id || order.value.paid) return;
+  const payType = '校园卡';
+  try {
+    uni.showLoading({ title: '支付中...' });
+    const res = await payOrder(order.value.id, { payType });
+    uni.hideLoading();
+    if (res.success) {
+      order.value.paid = true;
+      order.value.payType = payType;
+      uni.showToast({ title: '支付成功', icon: 'success' });
+    } else {
+      uni.showToast({ title: res.message || '支付失败', icon: 'none' });
+    }
+  } catch (e) {
+    uni.hideLoading();
+    uni.showToast({ title: '支付失败', icon: 'none' });
+  }
 };
 
 // 确认取消订单
@@ -124,7 +169,11 @@ onLoad(async (options) => {
   if (options.id) {
     try {
       const data = await fetchOrderDetail(options.id);
-      order.value = { ...order.value, ...data };
+      order.value = {
+        ...order.value,
+        ...data,
+        paid: data.paid ?? true,
+      };
     } catch (error) {
       uni.showToast({ title: '获取订单详情失败', icon: 'none' });
     }
@@ -190,6 +239,34 @@ onLoad(async (options) => {
 .order-time {
   color: #999;
   font-size: 26rpx;
+}
+
+.pickup-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.pickup-title {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.pickup-code {
+  margin-top: 16rpx;
+  font-size: 40rpx;
+  font-weight: 700;
+  letter-spacing: 8rpx;
+  color: #00c853;
+}
+
+.pickup-tip {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
 }
 
 .section-title {
@@ -274,7 +351,7 @@ onLoad(async (options) => {
 
 .order-actions {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   padding: 20rpx;
 }
 </style>

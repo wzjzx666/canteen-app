@@ -68,8 +68,9 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
+import md5 from 'js-md5';
+import { getLocalAccounts, setLocalAccounts } from '../../src/utils/storage';
 
-const formRef = ref(null);
 const loading = ref(false);
 
 const form = reactive({
@@ -98,32 +99,46 @@ const handleRegister = async () => {
   }
   
   loading.value = true;
-  
-  // 模拟注册请求
+
   setTimeout(() => {
-    loading.value = false;
-    
-    // 保存用户信息到本地存储
-    const userInfo = {
-      username: form.name,
-      userId: form.id,
+    const localAccounts = getLocalAccounts() || [];
+    const exists = localAccounts.some(
+      (item) => item.username === form.id && item.role === form.role,
+    );
+    if (exists) {
+      loading.value = false;
+      uni.showToast({
+        title: '该账号已注册',
+        icon: 'none',
+      });
+      return;
+    }
+
+    const newAccount = {
+      id: Date.now(),
+      username: form.id,
+      passwordHash: md5(form.password),
       role: form.role,
-      registerTime: new Date().getTime()
+      nickname: form.name,
+      avatar: '',
+      balance: 0,
+      studentId: form.id,
     };
-    
-    uni.setStorageSync('userInfo', userInfo);
-    
+
+    setLocalAccounts([newAccount, ...localAccounts]);
+
+    loading.value = false;
+
     uni.showToast({
       title: '注册成功',
-      icon: 'success'
+      icon: 'success',
     });
-    
-    // 注册成功后跳转到登录页面
+
     setTimeout(() => {
       uni.redirectTo({
-        url: '/pages/account/login'
+        url: '/pages/account/login',
       });
-    }, 1000);
+    }, 800);
   }, 800);
 };
 

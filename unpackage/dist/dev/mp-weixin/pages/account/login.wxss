@@ -1,0 +1,47 @@
+/* 水平间距 */
+/* 水平间距 */
+.data-v-1095b067:root {
+  --primary-color: #00C853;
+  --secondary-color: #E8F5E9;
+  --accent-color: #FF9800;
+}
+.login-page.data-v-1095b067 {
+  height: 90vh;
+  background: linear-gradient(135deg, #00c853, #3ae59f);
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+}
+.header.data-v-1095b067 {
+  text-align: center;
+  margin-top: 120rpx;
+  margin-bottom: 80rpx;
+}
+.title.data-v-1095b067 {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #fff;
+  display: block;
+  margin-bottom: 20rpx;
+}
+.subtitle.data-v-1095b067 {
+  font-size: 28rpx;
+  color: #e8f5e9;
+}
+.form-container.data-v-1095b067 {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  flex: 1;
+}
+.actions.data-v-1095b067 {
+  text-align: center;
+  margin-top: 30rpx;
+}
+.actions text.data-v-1095b067 {
+  color: #00c853;
+  font-size: 28rpx;
+}
+.data-v-1095b067 .uv-radio {
+  margin-bottom: 10rpx;
+}

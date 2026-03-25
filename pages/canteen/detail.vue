@@ -81,7 +81,7 @@
 import { ref, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useStore } from 'vuex';
-import { fetchCategories, fetchDishesByCanteen, fetchCanteens } from '/src/mock/mockData';
+import { fetchCategories, fetchDishesByCanteen, fetchCanteens } from '../../src/mock/mockData';
 
 const store = useStore();
 const canteenId = ref(null);
@@ -121,8 +121,38 @@ const removeDish = (dish) => {
 
 const checkout = () => {
   if (totalCount.value === 0) return;
-  uni.showToast({ title: '提交订单成功（模拟）', icon: 'success' });
+  const items = cartItems.value.filter((item) => item.canteenId === canteenId.value);
+  if (!items.length) return;
+  const id = `ORD-${Date.now()}`;
+  const totalPriceValue = items.reduce(
+    (sum, item) => sum + item.price * item.count,
+    0,
+  );
+  const newOrder = {
+    id,
+    status: 0,
+    paid: false,
+    payType: null,
+    pickupCode: String(Math.floor(100000 + Math.random() * 900000)),
+    createTime: Date.now(),
+    items: items.map((item) => ({
+      dishId: item.dishId,
+      count: item.count,
+      price: item.price,
+      name: item.name,
+    })),
+    totalPrice: Number(totalPriceValue.toFixed(2)),
+    canteenId: canteenId.value,
+  };
+
+  const { getOrdersStorage, setOrdersStorage } = require('/src/utils/storage.js');
+  const current = getOrdersStorage() || [];
+  setOrdersStorage([newOrder, ...current]);
+
   store.commit('cart/CLEAR_CART', canteenId.value);
+  uni.navigateTo({
+    url: `/pages/order/detail?id=${id}`,
+  });
 };
 
 const goCart = () => {

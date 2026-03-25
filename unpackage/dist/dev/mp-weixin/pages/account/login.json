@@ -1,0 +1,14 @@
+{
+  "navigationBarTitleText": "用户登录",
+  "navigationBarBackgroundColor": "#00C853",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
+    "uv-form-item": "../../uni_modules/uv-form/components/uv-form-item/uv-form-item",
+    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
+    "uv-radio": "../../uni_modules/uv-radio/components/uv-radio/uv-radio",
+    "uv-radio-group": "../../uni_modules/uv-radio/components/uv-radio-group/uv-radio-group",
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
+    "uv-form": "../../uni_modules/uv-form/components/uv-form/uv-form"
+  }
+}
