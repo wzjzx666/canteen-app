@@ -1,4 +1,4 @@
-import { getCartItems, setCartItems } from '../utils/storage';
+import { getCartItems, setCartItems } from '../../utils/storage';
 
 const state = () => ({
   cartItems: getCartItems(),
