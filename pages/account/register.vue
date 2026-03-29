@@ -70,6 +70,7 @@
 import { ref, reactive } from 'vue';
 import md5 from 'js-md5';
 import { getLocalAccounts, setLocalAccounts } from '../../src/utils/storage';
+import { apiPost } from '/src/services/apiClient';
 
 const loading = ref(false);
 
@@ -100,46 +101,64 @@ const handleRegister = async () => {
   
   loading.value = true;
 
-  setTimeout(() => {
-    const localAccounts = getLocalAccounts() || [];
-    const exists = localAccounts.some(
-      (item) => item.username === form.id && item.role === form.role,
-    );
-    if (exists) {
-      loading.value = false;
-      uni.showToast({
-        title: '该账号已注册',
-        icon: 'none',
+  const useReal = uni.getStorageSync('use_real_api') !== false;
+  try {
+    if (useReal) {
+      const res = await apiPost('/api/auth/register', {
+        username: form.id,
+        password: form.password,
+        role: form.role,
       });
-      return;
+      if (res?.success) {
+        uni.showToast({
+          title: '注册成功',
+          icon: 'success',
+        });
+        uni.redirectTo({
+          url: '/pages/account/login',
+        });
+        return;
+      }
     }
+  } catch (e) {
+    // fallback 到本地注册
+  }
 
-    const newAccount = {
-      id: Date.now(),
-      username: form.id,
-      passwordHash: md5(form.password),
-      role: form.role,
-      nickname: form.name,
-      avatar: '',
-      balance: 0,
-      studentId: form.id,
-    };
-
-    setLocalAccounts([newAccount, ...localAccounts]);
-
+  const localAccounts = getLocalAccounts() || [];
+  const exists = localAccounts.some(
+    (item) => item.username === form.id && item.role === form.role,
+  );
+  if (exists) {
     loading.value = false;
-
     uni.showToast({
-      title: '注册成功',
-      icon: 'success',
+      title: '该账号已注册',
+      icon: 'none',
     });
+    return;
+  }
 
-    setTimeout(() => {
-      uni.redirectTo({
-        url: '/pages/account/login',
-      });
-    }, 800);
-  }, 800);
+  const newAccount = {
+    id: Date.now(),
+    username: form.id,
+    passwordHash: md5(form.password),
+    role: form.role,
+    nickname: form.name,
+    avatar: '',
+    balance: 0,
+    studentId: form.id,
+  };
+
+  setLocalAccounts([newAccount, ...localAccounts]);
+  loading.value = false;
+
+  uni.showToast({
+    title: '注册成功',
+    icon: 'success',
+  });
+
+  uni.redirectTo({
+    url: '/pages/account/login',
+  });
 };
 
 const goToLogin = () => {

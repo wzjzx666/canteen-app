@@ -2,6 +2,7 @@ import Mock from '../utils/mockjs';
 import md5 from 'js-md5';
 import { users } from './data';
 import { getLocalAccounts } from '../utils/storage';
+import { apiGet, apiPost } from '/src/services/apiClient';
 
 const accountTemplates = [
   {
@@ -36,13 +37,50 @@ const accounts = accountTemplates.map((item) => ({
 }));
 
 export const mockLogin = async ({ username, password, role }) =>
-  new Promise((resolve) => {
+  new Promise(async (resolve) => {
+    const useReal = uni.getStorageSync('use_real_api') !== false;
+
+    if (useReal) {
+      try {
+        const normalizedRole = role === 'teacher' ? 'staff' : role;
+        const loginRes = await apiPost('/api/auth/login', {
+          username,
+          password,
+          role: normalizedRole,
+        });
+        if (loginRes?.code === 200 && loginRes?.data?.token) {
+          const token = loginRes.data.token;
+          const profile = await apiGet('/api/auth/profile', { token });
+          if (profile?.code === 200 && profile?.data) {
+            const user = profile.data;
+            if (normalizedRole && user.role !== normalizedRole) {
+              resolve({
+                code: 404,
+                success: false,
+                error: '用户不存在或角色不匹配',
+              });
+              return;
+            }
+            resolve({
+              code: 200,
+              success: true,
+              msg: '登录成功',
+              data: {
+                token,
+                user,
+              },
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        // fallback 到本地 mock
+      }
+    }
+
     setTimeout(() => {
       const localAccounts = getLocalAccounts() || [];
-      const allAccounts = [
-        ...localAccounts,
-        ...accounts,
-      ];
+      const allAccounts = [...localAccounts, ...accounts];
 
       const match = allAccounts.find(
         (item) => item.username == username && item.role === role,
@@ -56,7 +94,8 @@ export const mockLogin = async ({ username, password, role }) =>
         });
         return;
       }
-      if (match.passwordHash !== password) {
+      const hashed = md5(String(password).trim());
+      if (match.passwordHash !== hashed) {
         resolve({
           code: 401,
           success: false,

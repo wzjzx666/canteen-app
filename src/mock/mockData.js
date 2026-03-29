@@ -12,6 +12,9 @@ import {
   setOrdersStorage,
   getUserInfoStorage,
 } from '../utils/storage';
+import { apiGet } from '/src/services/apiClient';
+
+const useRealApi = () => uni.getStorageSync('use_real_api') !== false;
 
 const withDelay = (data, timeout = 400) =>
   new Promise((resolve) => {
@@ -34,27 +37,73 @@ const findOrderById = (orderId) => {
   return { all, target };
 };
 
-export const fetchCanteens = () => withDelay(canteens);
+export const fetchCanteens = async () => {
+  if (useRealApi()) {
+    try {
+      const res = await apiGet('/api/canteens');
+      if (res?.success && Array.isArray(res.data)) return res.data;
+    } catch (e) {
+      // fallback 到本地 mock
+    }
+  }
+  return withDelay(canteens);
+};
 
-export const fetchCategories = (canteenId) => {
+export const fetchCategories = async (canteenId) => {
+  if (useRealApi()) {
+    try {
+      const res = await apiGet('/api/categories', {
+        params: { canteenId: canteenId || undefined },
+      });
+      if (res?.success && Array.isArray(res.data)) return res.data;
+    } catch (e) {
+      // fallback
+    }
+  }
   if (canteenId) {
     return withDelay(categories.filter((c) => c.canteenId === canteenId));
   }
   return withDelay(categories);
 };
 
-export const fetchDishesByCanteen = (canteenId) => {
+export const fetchDishesByCanteen = async (canteenId) => {
+  if (useRealApi()) {
+    try {
+      const res = await apiGet('/api/dishes', { params: { canteenId } });
+      if (res?.success && Array.isArray(res.data)) return res.data;
+    } catch (e) {
+      // fallback
+    }
+  }
   const targetCategoryIds = categories
     .filter((c) => c.canteenId === canteenId)
     .map((c) => c.id);
   return withDelay(dishes.filter((d) => targetCategoryIds.includes(d.categoryId)));
 };
 
-export const fetchDishesByCategory = (categoryId) =>
-  withDelay(dishes.filter((d) => d.categoryId === categoryId));
+export const fetchDishesByCategory = async (categoryId) => {
+  if (useRealApi()) {
+    try {
+      const res = await apiGet('/api/dishes', { params: { categoryId } });
+      if (res?.success && Array.isArray(res.data)) return res.data;
+    } catch (e) {
+      // fallback
+    }
+  }
+  return withDelay(dishes.filter((d) => d.categoryId === categoryId));
+};
 
-export const fetchDishDetail = (dishId) =>
-  withDelay(dishes.find((d) => d.id === dishId));
+export const fetchDishDetail = async (dishId) => {
+  if (useRealApi()) {
+    try {
+      const res = await apiGet(`/api/dishes/${dishId}`);
+      if (res?.success && res?.data) return res.data;
+    } catch (e) {
+      // fallback
+    }
+  }
+  return withDelay(dishes.find((d) => d.id === dishId));
+};
 
 export const fetchOrders = (status = -1) => {
   const all = getOrders();
@@ -93,13 +142,22 @@ export const cancelOrder = (orderId) =>
   });
 
 // 根据角色获取用户信息
-export const fetchUser = () => {
-  const userInfo = getUserInfoStorage();
-  // 根据角色返回对应的用户数据
-  if (userInfo && users[userInfo.role]) {
-    return withDelay(users[userInfo.role]);
+export const fetchUser = async () => {
+  const localUser = getUserInfoStorage();
+  if (localUser && localUser.role) return withDelay(localUser);
+
+  if (useRealApi()) {
+    const token = uni.getStorageSync('token');
+    if (token) {
+      try {
+        const res = await apiGet('/api/auth/profile', { token });
+        if (res?.code === 200 && res?.success !== false && res?.data) return res.data;
+      } catch (e) {
+        // fallback
+      }
+    }
   }
-  // 默认返回学生用户
+
   return withDelay(users.student);
 };
 

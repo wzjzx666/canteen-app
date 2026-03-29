@@ -60,7 +60,6 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import md5 from 'js-md5';
 import { mockLogin } from '../../src/mock/mockAuth';
 
 const loading = ref(false);
@@ -84,7 +83,7 @@ const handleLogin = async () => {
   try {
     const res = await mockLogin({
       username: form.username.trim(),
-      password: md5((form.password).trim()),
+      password: form.password.trim(),
       role: form.role
     });
     if (res.code === 200 && res.data) {
