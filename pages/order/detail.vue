@@ -118,7 +118,7 @@ const statusClass = (status) => ['pending', 'success', 'cancel'][status] || '';
 // 计算菜品小计
 const calculateSubtotal = () => {
   return order.value.items.reduce((sum, item) => {
-    return sum + (item.price * item.count);
+    return sum + (item.price * item.quantity);
   }, 0);
 };
 

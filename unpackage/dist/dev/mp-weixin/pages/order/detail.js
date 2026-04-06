@@ -41,7 +41,7 @@ const _sfc_main = {
     const statusClass = (status) => ["pending", "success", "cancel"][status] || "";
     const calculateSubtotal = () => {
       return order.value.items.reduce((sum, item) => {
-        return sum + item.price * item.count;
+        return sum + item.price * item.quantity;
       }, 0);
     };
     const handlePay = async () => {
