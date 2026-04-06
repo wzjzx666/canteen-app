@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_icon2 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_button2 = common_vendor.resolveComponent("uv-button");
@@ -14,6 +13,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "index",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const store = common_vendor.useStore();
     const user = common_vendor.computed(() => store.state.user);
     const amountOptions = [10, 20, 50, 100, 200, 500];
@@ -32,27 +32,25 @@ const _sfc_main = {
       }
     };
     const handleRecharge = async () => {
+      var _a;
       if (finalAmount.value <= 0) {
         common_vendor.index.showToast({ title: "请选择充值金额", icon: "none" });
         return;
       }
       common_vendor.index.showLoading({ title: "充值中..." });
       try {
-        const result = await src_mock_mockData.recharge({
-          amount: finalAmount.value,
-          paymentMethod: paymentMethod.value
-        });
+        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        const newBalance = (Number((_a = user.value) == null ? void 0 : _a.balance) || 0) + finalAmount.value;
+        const res = await proxy.$api.updateUser(userInfo == null ? void 0 : userInfo.id, { balance: newBalance });
         common_vendor.index.hideLoading();
-        if (result.success) {
+        if ((res == null ? void 0 : res.code) === 200) {
           common_vendor.index.showToast({ title: "充值成功", icon: "success" });
           await store.dispatch("loadUser");
-          setTimeout(() => {
-            common_vendor.index.navigateBack();
-          }, 1500);
+          setTimeout(() => common_vendor.index.navigateBack(), 1500);
         } else {
-          common_vendor.index.showToast({ title: result.message || "充值失败", icon: "none" });
+          common_vendor.index.showToast({ title: (res == null ? void 0 : res.msg) || "充值失败", icon: "none" });
         }
-      } catch (error) {
+      } catch (e) {
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({ title: "充值失败", icon: "none" });
       }

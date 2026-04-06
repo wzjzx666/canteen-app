@@ -68,7 +68,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { recharge } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const store = useStore();
 const user = computed(() => store.state.user);
@@ -96,24 +98,20 @@ const handleRecharge = async () => {
     uni.showToast({ title: '请选择充值金额', icon: 'none' });
     return;
   }
-
   uni.showLoading({ title: '充值中...' });
   try {
-    const result = await recharge({
-      amount: finalAmount.value,
-      paymentMethod: paymentMethod.value,
-    });
+    const userInfo = uni.getStorageSync('userInfo');
+    const newBalance = (Number(user.value?.balance) || 0) + finalAmount.value;
+    const res = await proxy.$api.updateUser(userInfo?.id, { balance: newBalance });
     uni.hideLoading();
-    if (result.success) {
+    if (res?.code === 200) {
       uni.showToast({ title: '充值成功', icon: 'success' });
       await store.dispatch('loadUser');
-      setTimeout(() => {
-        uni.navigateBack();
-      }, 1500);
+      setTimeout(() => uni.navigateBack(), 1500);
     } else {
-      uni.showToast({ title: result.message || '充值失败', icon: 'none' });
+      uni.showToast({ title: res?.msg || '充值失败', icon: 'none' });
     }
-  } catch (error) {
+  } catch (e) {
     uni.hideLoading();
     uni.showToast({ title: '充值失败', icon: 'none' });
   }

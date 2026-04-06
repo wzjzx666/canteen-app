@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_button2 = common_vendor.resolveComponent("uv-button");
   const _easycom_uv_modal2 = common_vendor.resolveComponent("uv-modal");
@@ -14,6 +13,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "detail",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const order = common_vendor.ref({
       id: "",
       status: 0,
@@ -47,17 +47,16 @@ const _sfc_main = {
     const handlePay = async () => {
       if (!order.value.id || order.value.paid)
         return;
-      const payType = "校园卡";
       try {
         common_vendor.index.showLoading({ title: "支付中..." });
-        const res = await src_mock_mockData.payOrder(order.value.id, { payType });
+        const res = await proxy.$api.updateOrder(order.value.id, { paid: true, payType: "校园卡", status: "pending" });
         common_vendor.index.hideLoading();
-        if (res.success) {
+        if ((res == null ? void 0 : res.code) === 200) {
           order.value.paid = true;
-          order.value.payType = payType;
+          order.value.payType = "校园卡";
           common_vendor.index.showToast({ title: "支付成功", icon: "success" });
         } else {
-          common_vendor.index.showToast({ title: res.message || "支付失败", icon: "none" });
+          common_vendor.index.showToast({ title: "支付失败", icon: "none" });
         }
       } catch (e) {
         common_vendor.index.hideLoading();
@@ -71,7 +70,7 @@ const _sfc_main = {
     const handleCancel = async () => {
       if (!pendingOrderId.value)
         return;
-      await src_mock_mockData.cancelOrder(pendingOrderId.value);
+      await proxy.$api.updateOrder(pendingOrderId.value, { status: "canceled" });
       common_vendor.index.showToast({ title: "取消成功", icon: "success" });
       modal.value.close();
       pendingOrderId.value = null;
@@ -84,13 +83,11 @@ const _sfc_main = {
     common_vendor.onLoad(async (options) => {
       if (options.id) {
         try {
-          const data = await src_mock_mockData.fetchOrderDetail(options.id);
-          order.value = {
-            ...order.value,
-            ...data,
-            paid: data.paid ?? true
-          };
-        } catch (error) {
+          const res = await proxy.$api.getOrderById(options.id);
+          if ((res == null ? void 0 : res.code) === 200 && (res == null ? void 0 : res.data)) {
+            order.value = { ...order.value, ...res.data };
+          }
+        } catch (e) {
           common_vendor.index.showToast({ title: "获取订单详情失败", icon: "none" });
         }
       }
@@ -111,8 +108,8 @@ const _sfc_main = {
           return {
             a: common_vendor.t(item.name),
             b: common_vendor.t(item.price),
-            c: common_vendor.t(item.count),
-            d: common_vendor.t((item.price * item.count).toFixed(2)),
+            c: common_vendor.t(item.quantity),
+            d: common_vendor.t((item.price * item.quantity).toFixed(2)),
             e: item.dishId
           };
         }),

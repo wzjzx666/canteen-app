@@ -21,7 +21,7 @@ const _sfc_main = {
     const displayName = common_vendor.computed(() => {
       if (!currentUser.value)
         return "未登录";
-      return currentUser.value.name;
+      return currentUser.value.nickname || currentUser.value.username || "未登录";
     });
     const goToOrders = () => {
       common_vendor.index.switchTab({ url: "/pages/order/list" });

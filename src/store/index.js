@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import cart from './modules/cart';
-import { fetchUser } from '../mock/mockData';
+import { getProfile } from '../../request/index';
 
 const store = createStore({
   state: () => ({
@@ -18,8 +18,14 @@ const store = createStore({
   actions: {
     async loadUser({ commit }) {
       commit('SET_USER_LOADING', true);
-      const res = await fetchUser();
-      commit('SET_USER', res);
+      try {
+        const res = await getProfile();
+        if (res?.code === 200 && res?.data) {
+          commit('SET_USER', res.data);
+        }
+      } catch (e) {
+        // ignore
+      }
       commit('SET_USER_LOADING', false);
     },
   },

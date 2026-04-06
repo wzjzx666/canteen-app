@@ -18,8 +18,8 @@
         <view class="items">
           <view v-for="item in order.items" :key="item.dishId" class="item">
             <text class="name">{{ item.name }}</text>
-            <text class="count">x{{ item.count }}</text>
-            <text class="price">¥{{ (item.price * item.count).toFixed(2) }}</text>
+            <text class="count">x{{ item.quantity }}</text>
+            <text class="price">¥{{ (item.price * item.quantity).toFixed(2) }}</text>
           </view>
         </view>
         <view class="footer">
@@ -49,7 +49,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { fetchOrders, cancelOrder } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const tabList = [
   { name: '全部', value: -1 },
@@ -64,8 +66,10 @@ const orders = ref([]);
 const pendingOrderId = ref(null);
 
 const loadOrders = async () => {
+  const res = await proxy.$api.getOrders();
+  const all = (res?.code === 200 && Array.isArray(res.data)) ? res.data : [];
   const status = tabList[currentTab.value].value;
-  orders.value = await fetchOrders(status);
+  orders.value = status === -1 ? all : all.filter((o) => o.status === status);
 };
 
 const onTabChange = ({ index }) => {
@@ -73,8 +77,8 @@ const onTabChange = ({ index }) => {
   loadOrders();
 };
 
-const statusText = (status) => ['待取餐', '已完成', '已取消'][status] || '未知';
-const statusClass = (status) => ['pending', 'success', 'cancel'][status] || '';
+const statusText = (status) => ({ pending: '待取餐', completed: '已完成', canceled: '已取消' })[status] || '未知';
+const statusClass = (status) => ({ pending: 'pending', completed: 'success', canceled: 'cancel' })[status] || '';
 
 const confirmCancel = (orderId) => {
   pendingOrderId.value = orderId;
@@ -87,7 +91,7 @@ const goToDetail = (orderId) => {
 };
 const handleCancel = async () => {
   if (!pendingOrderId.value) return;
-  await cancelOrder(pendingOrderId.value);
+  await proxy.$api.updateOrder(pendingOrderId.value, { status: 'canceled' });
   uni.showToast({ title: '取消成功', icon: 'success' });
   modal.value.close();
   pendingOrderId.value = null;

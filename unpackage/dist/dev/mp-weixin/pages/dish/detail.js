@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_uv_button2 = common_vendor.resolveComponent("uv-button");
@@ -14,6 +13,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "detail",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const dish = common_vendor.ref(null);
     const store = common_vendor.useStore();
     const canteenId = common_vendor.ref(null);
@@ -36,7 +36,9 @@ const _sfc_main = {
     common_vendor.onLoad(async (options) => {
       const id = Number(options == null ? void 0 : options.id);
       canteenId.value = Number((options == null ? void 0 : options.canteenId) || 1);
-      dish.value = await src_mock_mockData.fetchDishDetail(id);
+      const res = await proxy.$api.getDishById(id);
+      if ((res == null ? void 0 : res.code) === 200 && (res == null ? void 0 : res.data))
+        dish.value = res.data;
     });
     return (_ctx, _cache) => {
       var _a, _b, _c, _d, _e, _f, _g;

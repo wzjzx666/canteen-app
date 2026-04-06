@@ -22,7 +22,9 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useStore } from 'vuex';
-import { fetchDishDetail } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const dish = ref(null);
 const store = useStore();
@@ -48,7 +50,8 @@ const buyNow = () => {
 onLoad(async (options) => {
   const id = Number(options?.id);
   canteenId.value = Number(options?.canteenId || 1);
-  dish.value = await fetchDishDetail(id);
+  const res = await proxy.$api.getDishById(id);
+  if (res?.code === 200 && res?.data) dish.value = res.data;
 });
 </script>
 

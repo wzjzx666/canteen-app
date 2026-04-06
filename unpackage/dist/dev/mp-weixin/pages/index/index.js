@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uni_icons2 = common_vendor.resolveComponent("uni-icons");
   const _easycom_uv_navbar2 = common_vendor.resolveComponent("uv-navbar");
@@ -24,6 +23,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "index",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const location = common_vendor.ref("校园内");
     const searchKeyword = common_vendor.ref("");
     const canteenList = common_vendor.ref([]);
@@ -43,17 +43,23 @@ const _sfc_main = {
       );
     });
     const buildBanner = async (canteenId) => {
-      const dishes = await src_mock_mockData.fetchDishesByCanteen(canteenId);
-      bannerList.value = dishes.slice(0, 4).map((d) => ({
-        image: d.image,
-        title: d.name
-      }));
+      try {
+        const res = await proxy.$api.getDishes({ canteenId });
+        const dishes = (res == null ? void 0 : res.code) === 200 && Array.isArray(res.data) ? res.data : [];
+        bannerList.value = dishes.slice(0, 4).map((d) => ({ image: d.imageUrl, title: d.name }));
+      } catch (e) {
+      }
     };
     const loadCanteens = async () => {
       var _a;
-      const list = await src_mock_mockData.fetchCanteens();
-      canteenList.value = list;
-      buildBanner(((_a = list[0]) == null ? void 0 : _a.id) || 1);
+      try {
+        const res = await proxy.$api.getCanteens();
+        if ((res == null ? void 0 : res.code) === 200 && Array.isArray(res.data)) {
+          canteenList.value = res.data;
+          buildBanner(((_a = res.data[0]) == null ? void 0 : _a.id) || 1);
+        }
+      } catch (e) {
+      }
     };
     const goCanteen = (canteen) => {
       common_vendor.index.navigateTo({

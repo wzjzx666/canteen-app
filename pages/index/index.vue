@@ -83,7 +83,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { fetchCanteens, fetchDishesByCanteen } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const location = ref('校园内');
 const searchKeyword = ref('');
@@ -108,24 +110,21 @@ const filteredCanteens = computed(() => {
 });
 
 const buildBanner = async (canteenId) => {
-  const dishes = await fetchDishesByCanteen(canteenId);
-  bannerList.value = dishes.slice(0, 4).map((d) => ({
-    image: d.image,
-    title: d.name,
-  }));
+  try {
+    const res = await proxy.$api.getDishes({ canteenId });
+    const dishes = (res?.code === 200 && Array.isArray(res.data)) ? res.data : [];
+    bannerList.value = dishes.slice(0, 4).map((d) => ({ image: d.imageUrl, title: d.name }));
+  } catch (e) { /* ignore */ }
 };
 
-
 const loadCanteens = async () => {
-  
-  // const result = await this.$api.get('/api/canteens');
-  //     if (result.success) {
-  //       canteenList.value = result.data;
-  //     } else {
-        const list = await fetchCanteens();
-        canteenList.value = list;
-        buildBanner(list[0]?.id || 1);
-      // }
+  try {
+    const res = await proxy.$api.getCanteens();
+    if (res?.code === 200 && Array.isArray(res.data)) {
+      canteenList.value = res.data;
+      buildBanner(res.data[0]?.id || 1);
+    }
+  } catch (e) { /* ignore */ }
 };
 
 const goCanteen = (canteen) => {

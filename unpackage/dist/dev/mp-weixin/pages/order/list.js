@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_tabs2 = common_vendor.resolveComponent("uv-tabs");
   const _easycom_uv_button2 = common_vendor.resolveComponent("uv-button");
@@ -16,6 +15,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "list",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const tabList = [
       { name: "全部", value: -1 },
       { name: "待取餐", value: 0 },
@@ -28,15 +28,17 @@ const _sfc_main = {
     const orders = common_vendor.ref([]);
     const pendingOrderId = common_vendor.ref(null);
     const loadOrders = async () => {
+      const res = await proxy.$api.getOrders();
+      const all = (res == null ? void 0 : res.code) === 200 && Array.isArray(res.data) ? res.data : [];
       const status = tabList[currentTab.value].value;
-      orders.value = await src_mock_mockData.fetchOrders(status);
+      orders.value = status === -1 ? all : all.filter((o) => o.status === status);
     };
     const onTabChange = ({ index }) => {
       currentTab.value = index;
       loadOrders();
     };
-    const statusText = (status) => ["待取餐", "已完成", "已取消"][status] || "未知";
-    const statusClass = (status) => ["pending", "success", "cancel"][status] || "";
+    const statusText = (status) => ({ pending: "待取餐", completed: "已完成", canceled: "已取消" })[status] || "未知";
+    const statusClass = (status) => ({ pending: "pending", completed: "success", canceled: "cancel" })[status] || "";
     const confirmCancel = (orderId) => {
       pendingOrderId.value = orderId;
       modal.value.open();
@@ -49,7 +51,7 @@ const _sfc_main = {
     const handleCancel = async () => {
       if (!pendingOrderId.value)
         return;
-      await src_mock_mockData.cancelOrder(pendingOrderId.value);
+      await proxy.$api.updateOrder(pendingOrderId.value, { status: "canceled" });
       common_vendor.index.showToast({ title: "取消成功", icon: "success" });
       modal.value.close();
       pendingOrderId.value = null;
@@ -79,8 +81,8 @@ const _sfc_main = {
             e: common_vendor.f(order.items, (item, k1, i1) => {
               return {
                 a: common_vendor.t(item.name),
-                b: common_vendor.t(item.count),
-                c: common_vendor.t((item.price * item.count).toFixed(2)),
+                b: common_vendor.t(item.quantity),
+                c: common_vendor.t((item.price * item.quantity).toFixed(2)),
                 d: item.dishId
               };
             }),

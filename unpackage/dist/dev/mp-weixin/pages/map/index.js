@@ -1,20 +1,16 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_data = require("../../src/mock/data.js");
 const _sfc_main = {
   data() {
-    const lats = src_mock_data.canteens.map((c) => c.latitude);
-    const lngs = src_mock_data.canteens.map((c) => c.longitude);
-    const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length;
-    const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
     return {
-      latitude: avgLat,
-      longitude: avgLng
+      latitude: 23.099994,
+      longitude: 113.32452,
+      canteens: []
     };
   },
   computed: {
     canteenMarkers() {
-      return src_mock_data.canteens.map((c) => ({
+      return this.canteens.map((c) => ({
         id: c.id,
         latitude: c.latitude || 23.099994 + Math.random() * 2e-3 - 1e-3,
         longitude: c.longitude || 113.32452 + Math.random() * 2e-3 - 1e-3,
@@ -34,45 +30,38 @@ const _sfc_main = {
       }));
     }
   },
+  async onLoad() {
+    const res = await this.$api.getCanteens();
+    if ((res == null ? void 0 : res.code) === 200 && Array.isArray(res.data)) {
+      this.canteens = res.data;
+    }
+  },
   onReady() {
     this._mapContext = common_vendor.index.createMapContext("map", this);
     this._mapContext.initMarkerCluster({
       enableDefaultStyle: false,
       zoomOnClick: true,
-      gridSize: 60,
-      complete(res) {
-        console.log("initMarkerCluster", res);
-      }
+      gridSize: 60
     });
     this._mapContext.on("markerClusterCreate", (e) => {
-      console.log("markerClusterCreate", e);
     });
     this.addMarkers();
   },
   methods: {
     addMarkers() {
-      const positions = this.canteenMarkers.map((m) => ({
-        latitude: m.latitude,
-        longitude: m.longitude
-      }));
+      const positions = this.canteenMarkers.map((m) => ({ latitude: m.latitude, longitude: m.longitude }));
       this._mapContext.addMarkers({
         markers: this.canteenMarkers,
         clear: false,
-        complete: (res) => {
-          console.log("addMarkers", res);
-          this._mapContext.includePoints({
-            points: positions,
-            padding: [20],
-            complete: (res2) => {
-              console.log("includePoints", res2);
-            }
-          });
+        complete: () => {
+          this._mapContext.includePoints({ points: positions, padding: [20] });
         }
       });
     },
     handleMarkerClick(e) {
-      const markerId = e.markerId;
-      src_mock_data.canteens.find((c) => c.id === markerId);
+      const canteen = this.canteens.find((c) => c.id === e.markerId);
+      if (canteen)
+        common_vendor.index.showToast({ title: canteen.name, icon: "none" });
     }
   }
 };

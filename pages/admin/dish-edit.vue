@@ -76,7 +76,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { fetchCategories, fetchDishDetail, saveDish, createDish } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const dishId = ref(null);
 const categoryOptions = ref([]);
@@ -114,48 +116,23 @@ const chooseImage = () => {
 };
 
 const handleSave = async () => {
-  if (!form.value.name) {
-    uni.showToast({ title: '请输入菜品名称', icon: 'none' });
-    return;
-  }
-  if (!form.value.categoryId) {
-    uni.showToast({ title: '请选择分类', icon: 'none' });
-    return;
-  }
-  if (!form.value.price || Number(form.value.price) <= 0) {
-    uni.showToast({ title: '请输入有效价格', icon: 'none' });
-    return;
-  }
-  if (!form.value.stock || Number(form.value.stock) < 0) {
-    uni.showToast({ title: '请输入有效库存', icon: 'none' });
-    return;
-  }
+  if (!form.value.name) { uni.showToast({ title: '请输入菜品名称', icon: 'none' }); return; }
+  if (!form.value.categoryId) { uni.showToast({ title: '请选择分类', icon: 'none' }); return; }
+  if (!form.value.price || Number(form.value.price) <= 0) { uni.showToast({ title: '请输入有效价格', icon: 'none' }); return; }
+  if (!form.value.stock || Number(form.value.stock) < 0) { uni.showToast({ title: '请输入有效库存', icon: 'none' }); return; }
 
   uni.showLoading({ title: '保存中...' });
   try {
-    const data = {
-      ...form.value,
-      price: Number(form.value.price),
-      stock: Number(form.value.stock),
-    };
-
-    let result;
-    if (dishId.value) {
-      result = await saveDish(dishId.value, data);
-    } else {
-      result = await createDish(data);
-    }
-
+    const data = { ...form.value, price: Number(form.value.price), stock: Number(form.value.stock) };
+    const res = dishId.value ? await proxy.$api.updateDish(dishId.value, data) : await proxy.$api.createDish(data);
     uni.hideLoading();
-    if (result.success) {
+    if (res?.code === 200) {
       uni.showToast({ title: '保存成功', icon: 'success' });
-      setTimeout(() => {
-        uni.navigateBack();
-      }, 1500);
+      setTimeout(() => uni.navigateBack(), 1500);
     } else {
-      uni.showToast({ title: result.message || '保存失败', icon: 'none' });
+      uni.showToast({ title: res?.msg || '保存失败', icon: 'none' });
     }
-  } catch (error) {
+  } catch (e) {
     uni.hideLoading();
     uni.showToast({ title: '保存失败', icon: 'none' });
   }
@@ -164,25 +141,24 @@ const handleSave = async () => {
 onLoad(async (options) => {
   if (options.id) {
     dishId.value = Number(options.id);
-    const dish = await fetchDishDetail(dishId.value);
-    if (dish) {
+    const res = await proxy.$api.getDishById(dishId.value);
+    if (res?.code === 200 && res?.data) {
+      const dish = res.data;
       form.value = {
         name: dish.name,
         categoryId: dish.categoryId,
         price: String(dish.price),
         stock: String(dish.stock),
         description: dish.description || '',
-        image: dish.image || '',
-        onShelf: dish.onShelf !== false,
+        image: dish.imageUrl || '',
+        available: dish.available !== false,
       };
       const catIndex = categoryOptions.value.findIndex((c) => c.id === dish.categoryId);
       if (catIndex >= 0) categoryIndex.value = catIndex;
     }
   }
-
-  // 加载所有分类
-  const categories = await fetchCategories();
-  categoryOptions.value = categories;
+  const catsRes = await proxy.$api.getCategories();
+  categoryOptions.value = (catsRes?.code === 200 && Array.isArray(catsRes.data)) ? catsRes.data : [];
 });
 </script>
 

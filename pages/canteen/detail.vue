@@ -30,7 +30,7 @@
           :key="dish.id"
           class="dish-card"
         >
-          <uv-image :src="dish.image" width="160rpx" height="160rpx" radius="16rpx" />
+          <uv-image :src="dish.imageUrl" width="160rpx" height="160rpx" radius="16rpx" />
           <view class="dish-info">
             <view class="dish-title">{{ dish.name }}</view>
             <view class="desc">{{ dish.description }}</view>
@@ -81,7 +81,9 @@
 import { ref, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useStore } from 'vuex';
-import { fetchCategories, fetchDishesByCanteen, fetchCanteens } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const store = useStore();
 const canteenId = ref(null);
@@ -96,7 +98,9 @@ const totalPrice = computed(() => store.getters['cart/totalPrice']);
 
 const filteredDishes = computed(() => {
   if (!selectedCategoryId.value) return [];
-  return dishList.value.filter((d) => d.categoryId === selectedCategoryId.value);
+  const selectedCat = categoryList.value.find((c) => c.id === selectedCategoryId.value);
+  if (!selectedCat) return [];
+  return dishList.value.filter((d) => d.category === selectedCat.name);
 });
 
 const getCount = (dishId) => {
@@ -119,40 +123,28 @@ const removeDish = (dish) => {
   store.commit('cart/REMOVE_FROM_CART', dish.id);
 };
 
-const checkout = () => {
+const checkout = async () => {
   if (totalCount.value === 0) return;
   const items = cartItems.value.filter((item) => item.canteenId === canteenId.value);
   if (!items.length) return;
-  const id = `ORD-${Date.now()}`;
-  const totalPriceValue = items.reduce(
-    (sum, item) => sum + item.price * item.count,
-    0,
-  );
+  const totalPriceValue = items.reduce((sum, item) => sum + item.price * item.count, 0);
   const newOrder = {
-    id,
-    status: 0,
+    userId: uni.getStorageSync('userInfo')?.id,
+    status: 'pending',
     paid: false,
-    payType: null,
     pickupCode: String(Math.floor(100000 + Math.random() * 900000)),
-    createTime: Date.now(),
-    items: items.map((item) => ({
-      dishId: item.dishId,
-      count: item.count,
-      price: item.price,
-      name: item.name,
-    })),
     totalPrice: Number(totalPriceValue.toFixed(2)),
     canteenId: canteenId.value,
   };
 
-  const { getOrdersStorage, setOrdersStorage } = require('/src/utils/storage.js');
-  const current = getOrdersStorage() || [];
-  setOrdersStorage([newOrder, ...current]);
-
-  store.commit('cart/CLEAR_CART', canteenId.value);
-  uni.navigateTo({
-    url: `/pages/order/detail?id=${id}`,
-  });
+  try {
+    const res = await proxy.$api.createOrder(newOrder);
+    const orderId = res?.data?.id || res?.data;
+    store.commit('cart/CLEAR_CART', canteenId.value);
+    uni.navigateTo({ url: `/pages/order/detail?id=${orderId}` });
+  } catch (e) {
+    uni.showToast({ title: '下单失败', icon: 'none' });
+  }
 };
 
 const goCart = () => {
@@ -161,11 +153,14 @@ const goCart = () => {
 
 onLoad(async (options) => {
   canteenId.value = Number(options?.canteenId || 1);
-  const [cats, dishes, canteens] = await Promise.all([
-    fetchCategories(canteenId.value),
-    fetchDishesByCanteen(canteenId.value),
-    fetchCanteens(),
+  const [catsRes, dishesRes, canteensRes] = await Promise.all([
+    proxy.$api.getCategories({ canteenId: canteenId.value }),
+    proxy.$api.getDishes({ canteenId: canteenId.value }),
+    proxy.$api.getCanteens(),
   ]);
+  const cats = (catsRes?.code === 200 && Array.isArray(catsRes.data)) ? catsRes.data : [];
+  const dishes = (dishesRes?.code === 200 && Array.isArray(dishesRes.data)) ? dishesRes.data : [];
+  const canteens = (canteensRes?.code === 200 && Array.isArray(canteensRes.data)) ? canteensRes.data : [];
   categoryList.value = cats;
   dishList.value = dishes;
   selectedCategoryId.value = cats[0]?.id || null;

@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_uv_button2 = common_vendor.resolveComponent("uv-button");
@@ -14,6 +13,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "dish-list",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const canteens = common_vendor.ref([]);
     const dishes = common_vendor.ref([]);
     const categories = common_vendor.ref([]);
@@ -27,15 +27,15 @@ const _sfc_main = {
     const toggleShelf = async (dish) => {
       common_vendor.index.showLoading({ title: "处理中..." });
       try {
-        const result = await src_mock_mockData.toggleDishShelf(dish.id);
+        const res = await proxy.$api.updateDish(dish.id, { available: !dish.available });
         common_vendor.index.hideLoading();
-        if (result.success) {
-          dish.onShelf = result.onShelf;
-          common_vendor.index.showToast({ title: result.onShelf ? "已上架" : "已下架", icon: "success" });
+        if ((res == null ? void 0 : res.code) === 200) {
+          dish.available = !dish.available;
+          common_vendor.index.showToast({ title: dish.available ? "已上架" : "已下架", icon: "success" });
         } else {
           common_vendor.index.showToast({ title: "操作失败", icon: "none" });
         }
-      } catch (error) {
+      } catch (e) {
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({ title: "操作失败", icon: "none" });
       }
@@ -51,14 +51,14 @@ const _sfc_main = {
       });
     };
     common_vendor.onMounted(async () => {
-      const [canteensData, dishesData, categoriesData] = await Promise.all([
-        src_mock_mockData.fetchCanteens(),
-        src_mock_mockData.fetchAllDishes(),
-        src_mock_mockData.fetchCategories()
+      const [canteensRes, dishesRes, categoriesRes] = await Promise.all([
+        proxy.$api.getCanteens(),
+        proxy.$api.getDishes(),
+        proxy.$api.getCategories()
       ]);
-      canteens.value = canteensData;
-      dishes.value = dishesData;
-      categories.value = categoriesData;
+      canteens.value = (canteensRes == null ? void 0 : canteensRes.code) === 200 && Array.isArray(canteensRes.data) ? canteensRes.data : [];
+      dishes.value = (dishesRes == null ? void 0 : dishesRes.code) === 200 && Array.isArray(dishesRes.data) ? dishesRes.data : [];
+      categories.value = (categoriesRes == null ? void 0 : categoriesRes.code) === 200 && Array.isArray(categoriesRes.data) ? categoriesRes.data : [];
     });
     return (_ctx, _cache) => {
       return {

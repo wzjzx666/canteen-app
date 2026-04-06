@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_uv_icon2 = common_vendor.resolveComponent("uv-icon");
@@ -16,6 +15,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "dish-edit",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const dishId = common_vendor.ref(null);
     const categoryOptions = common_vendor.ref([]);
     const categoryIndex = common_vendor.ref(0);
@@ -65,27 +65,16 @@ const _sfc_main = {
       }
       common_vendor.index.showLoading({ title: "保存中..." });
       try {
-        const data = {
-          ...form.value,
-          price: Number(form.value.price),
-          stock: Number(form.value.stock)
-        };
-        let result;
-        if (dishId.value) {
-          result = await src_mock_mockData.saveDish(dishId.value, data);
-        } else {
-          result = await src_mock_mockData.createDish(data);
-        }
+        const data = { ...form.value, price: Number(form.value.price), stock: Number(form.value.stock) };
+        const res = dishId.value ? await proxy.$api.updateDish(dishId.value, data) : await proxy.$api.createDish(data);
         common_vendor.index.hideLoading();
-        if (result.success) {
+        if ((res == null ? void 0 : res.code) === 200) {
           common_vendor.index.showToast({ title: "保存成功", icon: "success" });
-          setTimeout(() => {
-            common_vendor.index.navigateBack();
-          }, 1500);
+          setTimeout(() => common_vendor.index.navigateBack(), 1500);
         } else {
-          common_vendor.index.showToast({ title: result.message || "保存失败", icon: "none" });
+          common_vendor.index.showToast({ title: (res == null ? void 0 : res.msg) || "保存失败", icon: "none" });
         }
-      } catch (error) {
+      } catch (e) {
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({ title: "保存失败", icon: "none" });
       }
@@ -93,24 +82,25 @@ const _sfc_main = {
     common_vendor.onLoad(async (options) => {
       if (options.id) {
         dishId.value = Number(options.id);
-        const dish = await src_mock_mockData.fetchDishDetail(dishId.value);
-        if (dish) {
+        const res = await proxy.$api.getDishById(dishId.value);
+        if ((res == null ? void 0 : res.code) === 200 && (res == null ? void 0 : res.data)) {
+          const dish = res.data;
           form.value = {
             name: dish.name,
             categoryId: dish.categoryId,
             price: String(dish.price),
             stock: String(dish.stock),
             description: dish.description || "",
-            image: dish.image || "",
-            onShelf: dish.onShelf !== false
+            image: dish.imageUrl || "",
+            available: dish.available !== false
           };
           const catIndex = categoryOptions.value.findIndex((c) => c.id === dish.categoryId);
           if (catIndex >= 0)
             categoryIndex.value = catIndex;
         }
       }
-      const categories = await src_mock_mockData.fetchCategories();
-      categoryOptions.value = categories;
+      const catsRes = await proxy.$api.getCategories();
+      categoryOptions.value = (catsRes == null ? void 0 : catsRes.code) === 200 && Array.isArray(catsRes.data) ? catsRes.data : [];
     });
     return (_ctx, _cache) => {
       var _a;

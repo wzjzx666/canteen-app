@@ -60,58 +60,40 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { mockLogin } from '../../src/mock/mockAuth';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const loading = ref(false);
 const showPassword = ref(false);
 const form = reactive({
   username: '',
   password: '',
-  role: 'student' // 默认角色为学生
+  role: 'student'
 });
 
 const handleLogin = async () => {
   if (!form.username || !form.password) {
-    uni.showToast({
-      title: '请输入用户名和密码',
-      icon: 'none'
-    });
+    uni.showToast({ title: '请输入用户名和密码', icon: 'none' });
     return;
   }
-
   loading.value = true;
   try {
-    const res = await mockLogin({
-      username: form.username.trim(),
-      password: form.password.trim(),
-      role: form.role
-    });
-    if (res.code === 200 && res.data) {
-      uni.setStorageSync('token', res.data.token);
-      uni.setStorageSync('userInfo', res.data.user);
-      uni.setStorageSync('lastLogin', {
-        username: form.username.trim(),
-        role: form.role
-      });
-      uni.showToast({
-        title: res.msg || '登录成功',
-        icon: 'success'
-      });
-      uni.reLaunch({
-        url: '/pages/index/index'
-      });
+    const res = await proxy.$api.login({ username: form.username.trim(), password: form.password.trim() });
+    if (res?.code === 200 && res?.data?.token) {
+      const token = res.data.token;
+      uni.setStorageSync('token', token);
+      const profileRes = await proxy.$api.getProfile();
+      if (profileRes?.code === 200 && profileRes?.data) {
+        uni.setStorageSync('userInfo', profileRes.data);
+      }
+      uni.showToast({ title: '登录成功', icon: 'success' });
+      uni.reLaunch({ url: '/pages/index/index' });
     } else {
-      uni.showToast({
-        title: res.error || '登录失败',
-        icon: 'none'
-      });
+      uni.showToast({ title: res?.msg || '登录失败', icon: 'none' });
     }
-  } catch (error) {
-    console.error(error);
-    uni.showToast({
-      title: '登录异常，请稍后重试',
-      icon: 'none'
-    });
+  } catch (e) {
+    uni.showToast({ title: '登录异常，请稍后重试', icon: 'none' });
   } finally {
     loading.value = false;
   }
@@ -120,22 +102,13 @@ const handleLogin = async () => {
 onMounted(() => {
   const userInfo = uni.getStorageSync('userInfo');
   if (userInfo) {
-    uni.reLaunch({
-      url: '/pages/index/index'
-    });
+    uni.reLaunch({ url: '/pages/index/index' });
     return;
-  }
-  const lastLogin = uni.getStorageSync('lastLogin');
-  if (lastLogin) {
-    form.username = lastLogin.username || '';
-    form.role = lastLogin.role || 'student';
   }
 });
 
 const goToRegister = () => {
-  uni.navigateTo({
-    url: '/pages/account/register'
-  });
+  uni.navigateTo({ url: '/pages/account/register' });
 };
 
 const togglePasswordVisibility = () => {

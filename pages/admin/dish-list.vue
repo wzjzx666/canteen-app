@@ -62,7 +62,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { fetchCanteens, fetchAllDishes, fetchCategories, toggleDishShelf } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const canteens = ref([]);
 const dishes = ref([]);
@@ -81,15 +83,15 @@ const filteredDishes = computed(() => {
 const toggleShelf = async (dish) => {
   uni.showLoading({ title: '处理中...' });
   try {
-    const result = await toggleDishShelf(dish.id);
+    const res = await proxy.$api.updateDish(dish.id, { available: !dish.available });
     uni.hideLoading();
-    if (result.success) {
-      dish.onShelf = result.onShelf;
-      uni.showToast({ title: result.onShelf ? '已上架' : '已下架', icon: 'success' });
+    if (res?.code === 200) {
+      dish.available = !dish.available;
+      uni.showToast({ title: dish.available ? '已上架' : '已下架', icon: 'success' });
     } else {
       uni.showToast({ title: '操作失败', icon: 'none' });
     }
-  } catch (error) {
+  } catch (e) {
     uni.hideLoading();
     uni.showToast({ title: '操作失败', icon: 'none' });
   }
@@ -108,14 +110,14 @@ const addDish = () => {
 };
 
 onMounted(async () => {
-  const [canteensData, dishesData, categoriesData] = await Promise.all([
-    fetchCanteens(),
-    fetchAllDishes(),
-    fetchCategories(),
+  const [canteensRes, dishesRes, categoriesRes] = await Promise.all([
+    proxy.$api.getCanteens(),
+    proxy.$api.getDishes(),
+    proxy.$api.getCategories(),
   ]);
-  canteens.value = canteensData;
-  dishes.value = dishesData;
-  categories.value = categoriesData;
+  canteens.value = (canteensRes?.code === 200 && Array.isArray(canteensRes.data)) ? canteensRes.data : [];
+  dishes.value = (dishesRes?.code === 200 && Array.isArray(dishesRes.data)) ? dishesRes.data : [];
+  categories.value = (categoriesRes?.code === 200 && Array.isArray(categoriesRes.data)) ? categoriesRes.data : [];
 });
 </script>
 

@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockAuth = require("../../src/mock/mockAuth.js");
 if (!Array) {
   const _easycom_uv_input2 = common_vendor.resolveComponent("uv-input");
   const _easycom_uv_form_item2 = common_vendor.resolveComponent("uv-form-item");
@@ -24,55 +23,37 @@ if (!Math) {
 const _sfc_main = {
   __name: "login",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const loading = common_vendor.ref(false);
     const showPassword = common_vendor.ref(false);
     const form = common_vendor.reactive({
       username: "",
       password: "",
       role: "student"
-      // 默认角色为学生
     });
     const handleLogin = async () => {
+      var _a;
       if (!form.username || !form.password) {
-        common_vendor.index.showToast({
-          title: "请输入用户名和密码",
-          icon: "none"
-        });
+        common_vendor.index.showToast({ title: "请输入用户名和密码", icon: "none" });
         return;
       }
       loading.value = true;
       try {
-        const res = await src_mock_mockAuth.mockLogin({
-          username: form.username.trim(),
-          password: common_vendor.md5(form.password.trim()),
-          role: form.role
-        });
-        if (res.code === 200 && res.data) {
-          common_vendor.index.setStorageSync("token", res.data.token);
-          common_vendor.index.setStorageSync("userInfo", res.data.user);
-          common_vendor.index.setStorageSync("lastLogin", {
-            username: form.username.trim(),
-            role: form.role
-          });
-          common_vendor.index.showToast({
-            title: res.msg || "登录成功",
-            icon: "success"
-          });
-          common_vendor.index.reLaunch({
-            url: "/pages/index/index"
-          });
+        const res = await proxy.$api.login({ username: form.username.trim(), password: form.password.trim() });
+        if ((res == null ? void 0 : res.code) === 200 && ((_a = res == null ? void 0 : res.data) == null ? void 0 : _a.token)) {
+          const token = res.data.token;
+          common_vendor.index.setStorageSync("token", token);
+          const profileRes = await proxy.$api.getProfile();
+          if ((profileRes == null ? void 0 : profileRes.code) === 200 && (profileRes == null ? void 0 : profileRes.data)) {
+            common_vendor.index.setStorageSync("userInfo", profileRes.data);
+          }
+          common_vendor.index.showToast({ title: "登录成功", icon: "success" });
+          common_vendor.index.reLaunch({ url: "/pages/index/index" });
         } else {
-          common_vendor.index.showToast({
-            title: res.error || "登录失败",
-            icon: "none"
-          });
+          common_vendor.index.showToast({ title: (res == null ? void 0 : res.msg) || "登录失败", icon: "none" });
         }
-      } catch (error) {
-        console.error(error);
-        common_vendor.index.showToast({
-          title: "登录异常，请稍后重试",
-          icon: "none"
-        });
+      } catch (e) {
+        common_vendor.index.showToast({ title: "登录异常，请稍后重试", icon: "none" });
       } finally {
         loading.value = false;
       }
@@ -80,21 +61,12 @@ const _sfc_main = {
     common_vendor.onMounted(() => {
       const userInfo = common_vendor.index.getStorageSync("userInfo");
       if (userInfo) {
-        common_vendor.index.reLaunch({
-          url: "/pages/index/index"
-        });
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
         return;
-      }
-      const lastLogin = common_vendor.index.getStorageSync("lastLogin");
-      if (lastLogin) {
-        form.username = lastLogin.username || "";
-        form.role = lastLogin.role || "student";
       }
     });
     const goToRegister = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/account/register"
-      });
+      common_vendor.index.navigateTo({ url: "/pages/account/register" });
     };
     const togglePasswordVisibility = () => {
       showPassword.value = !showPassword.value;

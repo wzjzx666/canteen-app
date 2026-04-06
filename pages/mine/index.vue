@@ -36,7 +36,7 @@ const userInfo = ref(uni.getStorageSync('userInfo'));
 // 根据角色显示不同的称呼
 const displayName = computed(() => {
   if (!currentUser.value) return '未登录';
-  return currentUser.value.name;
+  return currentUser.value.nickname || currentUser.value.username || '未登录';
 });
 
 const goToOrders = () => {

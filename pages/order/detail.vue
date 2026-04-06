@@ -26,8 +26,8 @@
           <text class="item-price">¥{{ item.price }}</text>
         </view>
         <view class="item-count">
-          <text>数量：{{ item.count }}</text>
-          <text class="item-total">小计：¥{{ (item.price * item.count).toFixed(2) }}</text>
+          <text>数量：{{ item.quantity }}</text>
+          <text class="item-total">小计：¥{{ (item.price * item.quantity).toFixed(2) }}</text>
         </view>
       </view>
     </view>
@@ -80,7 +80,9 @@
 <script setup>
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { fetchOrderDetail, cancelOrder, payOrder } from '../../src/mock/mockData';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const order = ref({
   id: '',
@@ -123,17 +125,16 @@ const calculateSubtotal = () => {
 // 支付订单
 const handlePay = async () => {
   if (!order.value.id || order.value.paid) return;
-  const payType = '校园卡';
   try {
     uni.showLoading({ title: '支付中...' });
-    const res = await payOrder(order.value.id, { payType });
+    const res = await proxy.$api.updateOrder(order.value.id, { paid: true, payType: '校园卡', status: 'pending' });
     uni.hideLoading();
-    if (res.success) {
+    if (res?.code === 200) {
       order.value.paid = true;
-      order.value.payType = payType;
+      order.value.payType = '校园卡';
       uni.showToast({ title: '支付成功', icon: 'success' });
     } else {
-      uni.showToast({ title: res.message || '支付失败', icon: 'none' });
+      uni.showToast({ title: '支付失败', icon: 'none' });
     }
   } catch (e) {
     uni.hideLoading();
@@ -150,11 +151,10 @@ const confirmCancel = () => {
 // 处理取消订单
 const handleCancel = async () => {
   if (!pendingOrderId.value) return;
-  await cancelOrder(pendingOrderId.value);
+  await proxy.$api.updateOrder(pendingOrderId.value, { status: 'canceled' });
   uni.showToast({ title: '取消成功', icon: 'success' });
   modal.value.close();
   pendingOrderId.value = null;
-  // 更新订单状态
   order.value.status = 2;
 };
 
@@ -168,13 +168,11 @@ const cancel = () => {
 onLoad(async (options) => {
   if (options.id) {
     try {
-      const data = await fetchOrderDetail(options.id);
-      order.value = {
-        ...order.value,
-        ...data,
-        paid: data.paid ?? true,
-      };
-    } catch (error) {
+      const res = await proxy.$api.getOrderById(options.id);
+      if (res?.code === 200 && res?.data) {
+        order.value = { ...order.value, ...res.data };
+      }
+    } catch (e) {
       uni.showToast({ title: '获取订单详情失败', icon: 'none' });
     }
   }

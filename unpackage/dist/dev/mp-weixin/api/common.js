@@ -3,8 +3,8 @@ var env = "dev";
 const common = {
   env,
   dev: {
-    SERVER_HOST: "http://localhost:3000",
-    baseUrl: "http://localhost:3000"
+    SERVER_HOST: "",
+    baseUrl: ""
   },
   getBaseUrl: function() {
     return this[common.env].baseUrl;

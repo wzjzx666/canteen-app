@@ -68,9 +68,9 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
-import md5 from 'js-md5';
-import { getLocalAccounts, setLocalAccounts } from '../../src/utils/storage';
-import { apiPost } from '/src/services/apiClient';
+import { getCurrentInstance } from 'vue';
+
+const { proxy } = getCurrentInstance();
 
 const loading = ref(false);
 
@@ -79,86 +79,32 @@ const form = reactive({
   id: '',
   password: '',
   confirmPassword: '',
-  role: 'student' // 默认角色为学生
+  role: 'student'
 });
 
 const handleRegister = async () => {
   if (!form.name || !form.id || !form.password) {
-    uni.showToast({
-      title: '请填写完整信息',
-      icon: 'none'
-    });
+    uni.showToast({ title: '请填写完整信息', icon: 'none' });
     return;
   }
-  
   if (form.password !== form.confirmPassword) {
-    uni.showToast({
-      title: '两次输入的密码不一致',
-      icon: 'none'
-    });
+    uni.showToast({ title: '两次输入的密码不一致', icon: 'none' });
     return;
   }
-  
   loading.value = true;
-
-  const useReal = uni.getStorageSync('use_real_api') !== false;
   try {
-    if (useReal) {
-      const res = await apiPost('/api/auth/register', {
-        username: form.id,
-        password: form.password,
-        role: form.role,
-      });
-      if (res?.success) {
-        uni.showToast({
-          title: '注册成功',
-          icon: 'success',
-        });
-        uni.redirectTo({
-          url: '/pages/account/login',
-        });
-        return;
-      }
+    const res = await proxy.$api.register({ username: form.id, password: form.password, role: form.role });
+    if (res?.code === 200 || res?.data?.id) {
+      uni.showToast({ title: '注册成功', icon: 'success' });
+      uni.redirectTo({ url: '/pages/account/login' });
+    } else {
+      uni.showToast({ title: res?.msg || '注册失败', icon: 'none' });
     }
   } catch (e) {
-    // fallback 到本地注册
-  }
-
-  const localAccounts = getLocalAccounts() || [];
-  const exists = localAccounts.some(
-    (item) => item.username === form.id && item.role === form.role,
-  );
-  if (exists) {
+    uni.showToast({ title: '注册失败，请稍后重试', icon: 'none' });
+  } finally {
     loading.value = false;
-    uni.showToast({
-      title: '该账号已注册',
-      icon: 'none',
-    });
-    return;
   }
-
-  const newAccount = {
-    id: Date.now(),
-    username: form.id,
-    passwordHash: md5(form.password),
-    role: form.role,
-    nickname: form.name,
-    avatar: '',
-    balance: 0,
-    studentId: form.id,
-  };
-
-  setLocalAccounts([newAccount, ...localAccounts]);
-  loading.value = false;
-
-  uni.showToast({
-    title: '注册成功',
-    icon: 'success',
-  });
-
-  uni.redirectTo({
-    url: '/pages/account/login',
-  });
 };
 
 const goToLogin = () => {

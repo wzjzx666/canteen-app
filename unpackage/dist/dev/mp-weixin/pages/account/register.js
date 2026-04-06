@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_utils_storage = require("../../src/utils/storage.js");
 if (!Array) {
   const _easycom_uv_input2 = common_vendor.resolveComponent("uv-input");
   const _easycom_uv_form_item2 = common_vendor.resolveComponent("uv-form-item");
@@ -22,6 +21,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "register",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const loading = common_vendor.ref(false);
     const form = common_vendor.reactive({
       name: "",
@@ -29,59 +29,31 @@ const _sfc_main = {
       password: "",
       confirmPassword: "",
       role: "student"
-      // 默认角色为学生
     });
     const handleRegister = async () => {
+      var _a;
       if (!form.name || !form.id || !form.password) {
-        common_vendor.index.showToast({
-          title: "请填写完整信息",
-          icon: "none"
-        });
+        common_vendor.index.showToast({ title: "请填写完整信息", icon: "none" });
         return;
       }
       if (form.password !== form.confirmPassword) {
-        common_vendor.index.showToast({
-          title: "两次输入的密码不一致",
-          icon: "none"
-        });
+        common_vendor.index.showToast({ title: "两次输入的密码不一致", icon: "none" });
         return;
       }
       loading.value = true;
-      setTimeout(() => {
-        const localAccounts = src_utils_storage.getLocalAccounts() || [];
-        const exists = localAccounts.some(
-          (item) => item.username === form.id && item.role === form.role
-        );
-        if (exists) {
-          loading.value = false;
-          common_vendor.index.showToast({
-            title: "该账号已注册",
-            icon: "none"
-          });
-          return;
+      try {
+        const res = await proxy.$api.register({ username: form.id, password: form.password, role: form.role });
+        if ((res == null ? void 0 : res.code) === 200 || ((_a = res == null ? void 0 : res.data) == null ? void 0 : _a.id)) {
+          common_vendor.index.showToast({ title: "注册成功", icon: "success" });
+          common_vendor.index.redirectTo({ url: "/pages/account/login" });
+        } else {
+          common_vendor.index.showToast({ title: (res == null ? void 0 : res.msg) || "注册失败", icon: "none" });
         }
-        const newAccount = {
-          id: Date.now(),
-          username: form.id,
-          passwordHash: common_vendor.md5(form.password),
-          role: form.role,
-          nickname: form.name,
-          avatar: "",
-          balance: 0,
-          studentId: form.id
-        };
-        src_utils_storage.setLocalAccounts([newAccount, ...localAccounts]);
+      } catch (e) {
+        common_vendor.index.showToast({ title: "注册失败，请稍后重试", icon: "none" });
+      } finally {
         loading.value = false;
-        common_vendor.index.showToast({
-          title: "注册成功",
-          icon: "success"
-        });
-        setTimeout(() => {
-          common_vendor.index.redirectTo({
-            url: "/pages/account/login"
-          });
-        }, 800);
-      }, 800);
+      }
     };
     const goToLogin = () => {
       common_vendor.index.navigateBack();

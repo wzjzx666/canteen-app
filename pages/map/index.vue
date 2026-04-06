@@ -5,25 +5,17 @@
   </template>
   
   <script>
-  import { canteens } from '../../src/mock/data.js';
-
-  const img = '/static/logo.png';
-
   export default {
     data() {
-      // 计算所有食堂坐标的平均值作为地图中心点
-      const lats = canteens.map(c => c.latitude);
-      const lngs = canteens.map(c => c.longitude);
-      const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length;
-      const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
       return {
-        latitude: avgLat,
-        longitude: avgLng
+        latitude: 23.099994,
+        longitude: 113.324520,
+        canteens: []
       };
     },
     computed: {
       canteenMarkers() {
-        return canteens.map(c => ({
+        return this.canteens.map(c => ({
           id: c.id,
           latitude: c.latitude || (23.099994 + Math.random() * 0.002 - 0.001),
           longitude: c.longitude || (113.324520 + Math.random() * 0.002 - 0.001),
@@ -43,52 +35,36 @@
         }));
       }
     },
+    async onLoad() {
+      const res = await this.$api.getCanteens();
+      if (res?.code === 200 && Array.isArray(res.data)) {
+        this.canteens = res.data;
+      }
+    },
     onReady() {
       this._mapContext = uni.createMapContext("map", this);
-
-      // 仅调用初始化，才会触发 on.("markerClusterCreate", (e) => {})
       this._mapContext.initMarkerCluster({
         enableDefaultStyle: false,
         zoomOnClick: true,
         gridSize: 60,
-        complete(res) {
-          console.log('initMarkerCluster', res)
-        }
       });
-
-      this._mapContext.on("markerClusterCreate", (e) => {
-        console.log("markerClusterCreate", e);
-      });
-
+      this._mapContext.on("markerClusterCreate", (e) => {});
       this.addMarkers();
     },
     methods: {
       addMarkers() {
-        // 使用真实食堂数据作为标记点
-        const positions = this.canteenMarkers.map(m => ({
-          latitude: m.latitude,
-          longitude: m.longitude
-        }));
-
-        // 使用计算属性生成的食堂标记
+        const positions = this.canteenMarkers.map(m => ({ latitude: m.latitude, longitude: m.longitude }));
         this._mapContext.addMarkers({
-            markers: this.canteenMarkers,
-            clear: false,
-            complete: (res) => {
-              console.log('addMarkers', res);
-              this._mapContext.includePoints({
-                points: positions,
-                padding: [20],
-                complete: (res) => {
-                  console.log('includePoints', res);
-                }
-              });
-            }
-        })
+          markers: this.canteenMarkers,
+          clear: false,
+          complete: () => {
+            this._mapContext.includePoints({ points: positions, padding: [20] });
+          }
+        });
       },
       handleMarkerClick(e) {
-        const markerId = e.markerId;
-        const canteen = canteens.find(c => c.id === markerId);
+        const canteen = this.canteens.find(c => c.id === e.markerId);
+        if (canteen) uni.showToast({ title: canteen.name, icon: 'none' });
       }
     }
   }

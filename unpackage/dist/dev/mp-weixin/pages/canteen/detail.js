@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_mock_mockData = require("../../src/mock/mockData.js");
 if (!Array) {
   const _easycom_uv_rate2 = common_vendor.resolveComponent("uv-rate");
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
@@ -20,6 +19,7 @@ if (!Math) {
 const _sfc_main = {
   __name: "detail",
   setup(__props) {
+    const { proxy } = common_vendor.getCurrentInstance();
     const store = common_vendor.useStore();
     const canteenId = common_vendor.ref(null);
     const canteen = common_vendor.ref(null);
@@ -32,7 +32,10 @@ const _sfc_main = {
     const filteredDishes = common_vendor.computed(() => {
       if (!selectedCategoryId.value)
         return [];
-      return dishList.value.filter((d) => d.categoryId === selectedCategoryId.value);
+      const selectedCat = categoryList.value.find((c) => c.id === selectedCategoryId.value);
+      if (!selectedCat)
+        return [];
+      return dishList.value.filter((d) => d.category === selectedCat.name);
     });
     const getCount = (dishId) => {
       const item = cartItems.value.find((c) => c.dishId === dishId);
@@ -52,40 +55,30 @@ const _sfc_main = {
         return;
       store.commit("cart/REMOVE_FROM_CART", dish.id);
     };
-    const checkout = () => {
+    const checkout = async () => {
+      var _a, _b;
       if (totalCount.value === 0)
         return;
       const items = cartItems.value.filter((item) => item.canteenId === canteenId.value);
       if (!items.length)
         return;
-      const id = `ORD-${Date.now()}`;
-      const totalPriceValue = items.reduce(
-        (sum, item) => sum + item.price * item.count,
-        0
-      );
+      const totalPriceValue = items.reduce((sum, item) => sum + item.price * item.count, 0);
       const newOrder = {
-        id,
-        status: 0,
+        userId: (_a = common_vendor.index.getStorageSync("userInfo")) == null ? void 0 : _a.id,
+        status: "pending",
         paid: false,
-        payType: null,
         pickupCode: String(Math.floor(1e5 + Math.random() * 9e5)),
-        createTime: Date.now(),
-        items: items.map((item) => ({
-          dishId: item.dishId,
-          count: item.count,
-          price: item.price,
-          name: item.name
-        })),
         totalPrice: Number(totalPriceValue.toFixed(2)),
         canteenId: canteenId.value
       };
-      const { getOrdersStorage, setOrdersStorage } = require("/src/utils/storage.js");
-      const current = getOrdersStorage() || [];
-      setOrdersStorage([newOrder, ...current]);
-      store.commit("cart/CLEAR_CART", canteenId.value);
-      common_vendor.index.navigateTo({
-        url: `/pages/order/detail?id=${id}`
-      });
+      try {
+        const res = await proxy.$api.createOrder(newOrder);
+        const orderId = ((_b = res == null ? void 0 : res.data) == null ? void 0 : _b.id) || (res == null ? void 0 : res.data);
+        store.commit("cart/CLEAR_CART", canteenId.value);
+        common_vendor.index.navigateTo({ url: `/pages/order/detail?id=${orderId}` });
+      } catch (e) {
+        common_vendor.index.showToast({ title: "下单失败", icon: "none" });
+      }
     };
     const goCart = () => {
       common_vendor.index.showToast({ title: "当前为本地购物车", icon: "none" });
@@ -93,11 +86,14 @@ const _sfc_main = {
     common_vendor.onLoad(async (options) => {
       var _a;
       canteenId.value = Number((options == null ? void 0 : options.canteenId) || 1);
-      const [cats, dishes, canteens] = await Promise.all([
-        src_mock_mockData.fetchCategories(canteenId.value),
-        src_mock_mockData.fetchDishesByCanteen(canteenId.value),
-        src_mock_mockData.fetchCanteens()
+      const [catsRes, dishesRes, canteensRes] = await Promise.all([
+        proxy.$api.getCategories({ canteenId: canteenId.value }),
+        proxy.$api.getDishes({ canteenId: canteenId.value }),
+        proxy.$api.getCanteens()
       ]);
+      const cats = (catsRes == null ? void 0 : catsRes.code) === 200 && Array.isArray(catsRes.data) ? catsRes.data : [];
+      const dishes = (dishesRes == null ? void 0 : dishesRes.code) === 200 && Array.isArray(dishesRes.data) ? dishesRes.data : [];
+      const canteens = (canteensRes == null ? void 0 : canteensRes.code) === 200 && Array.isArray(canteensRes.data) ? canteensRes.data : [];
       categoryList.value = cats;
       dishList.value = dishes;
       selectedCategoryId.value = ((_a = cats[0]) == null ? void 0 : _a.id) || null;
@@ -126,7 +122,7 @@ const _sfc_main = {
           return {
             a: "699be342-1-" + i0,
             b: common_vendor.p({
-              src: dish.image,
+              src: dish.imageUrl,
               width: "160rpx",
               height: "160rpx",
               radius: "16rpx"
