@@ -17,10 +17,10 @@ const _sfc_main = {
   setup(__props) {
     const { proxy } = common_vendor.getCurrentInstance();
     const tabList = [
-      { name: "全部", value: -1 },
-      { name: "待取餐", value: 0 },
-      { name: "已完成", value: 1 },
-      { name: "已取消", value: 2 }
+      { name: "全部", value: null },
+      { name: "待取餐", value: "pending" },
+      { name: "已完成", value: "completed" },
+      { name: "已取消", value: "canceled" }
     ];
     const userInfo = common_vendor.ref(common_vendor.index.getStorageSync("userInfo"));
     const modal = common_vendor.ref(null);
@@ -28,10 +28,9 @@ const _sfc_main = {
     const orders = common_vendor.ref([]);
     const pendingOrderId = common_vendor.ref(null);
     const loadOrders = async () => {
-      const res = await proxy.$api.getOrders();
-      const all = (res == null ? void 0 : res.code) === 200 && Array.isArray(res.data) ? res.data : [];
       const status = tabList[currentTab.value].value;
-      orders.value = status === -1 ? all : all.filter((o) => o.status === status);
+      const res = await proxy.$api.getOrders(status ? { status } : {});
+      orders.value = (res == null ? void 0 : res.code) === 200 && Array.isArray(res.data) ? res.data : [];
     };
     const onTabChange = ({ index }) => {
       currentTab.value = index;

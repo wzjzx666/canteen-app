@@ -54,10 +54,10 @@ import { getCurrentInstance } from 'vue';
 const { proxy } = getCurrentInstance();
 
 const tabList = [
-  { name: '全部', value: -1 },
-  { name: '待取餐', value: 0 },
-  { name: '已完成', value: 1 },
-  { name: '已取消', value: 2 },
+  { name: '全部', value: null },
+  { name: '待取餐', value: 'pending' },
+  { name: '已完成', value: 'completed' },
+  { name: '已取消', value: 'canceled' },
 ];
 const userInfo = ref(uni.getStorageSync('userInfo'));
 const modal = ref(null);
@@ -66,10 +66,9 @@ const orders = ref([]);
 const pendingOrderId = ref(null);
 
 const loadOrders = async () => {
-  const res = await proxy.$api.getOrders();
-  const all = (res?.code === 200 && Array.isArray(res.data)) ? res.data : [];
   const status = tabList[currentTab.value].value;
-  orders.value = status === -1 ? all : all.filter((o) => o.status === status);
+  const res = await proxy.$api.getOrders(status ? { status } : {});
+  orders.value = (res?.code === 200 && Array.isArray(res.data)) ? res.data : [];
 };
 
 const onTabChange = ({ index }) => {

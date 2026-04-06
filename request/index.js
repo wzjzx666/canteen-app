@@ -95,7 +95,7 @@ export const deleteDish = (id) => del(`/api/dishes/${id}`, {}, { token: getToken
 // ==================== 订单 ====================
 
 // 获取订单列表
-export const getOrders = () => get('/api/orders', { token: getToken() });
+export const getOrders = (params) => get('/api/orders', { params, token: getToken() });
 
 // 根据 ID 获取订单
 export const getOrderById = (id) => get(`/api/orders/${id}`, { token: getToken() });

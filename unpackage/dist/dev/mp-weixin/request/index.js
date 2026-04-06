@@ -44,7 +44,7 @@ const getDishById = (id) => get(`/api/dishes/${id}`);
 const createDish = (data) => post("/api/dishes", data, { token: getToken() });
 const updateDish = (id, data) => put(`/api/dishes/${id}`, data, { token: getToken() });
 const deleteDish = (id) => del(`/api/dishes/${id}`, {}, { token: getToken() });
-const getOrders = () => get("/api/orders", { token: getToken() });
+const getOrders = (params) => get("/api/orders", { params, token: getToken() });
 const getOrderById = (id) => get(`/api/orders/${id}`, { token: getToken() });
 const createOrder = (data) => post("/api/orders", data, { token: getToken() });
 const updateOrder = (id, data) => put(`/api/orders/${id}`, data, { token: getToken() });
