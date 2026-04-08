@@ -124,7 +124,7 @@ const handleSave = async () => {
   uni.showLoading({ title: '保存中...' });
   try {
     const data = { ...form.value, price: Number(form.value.price), stock: Number(form.value.stock) };
-    const res = dishId.value ? await proxy.$api.updateDish(dishId.value, data) : await proxy.$api.createDish(data);
+    const res = dishId.value ? await proxy.$api.updateDish({ id: dishId.value, ...data }) : await proxy.$api.createDish(data);
     uni.hideLoading();
     if (res?.code === 200) {
       uni.showToast({ title: '保存成功', icon: 'success' });
@@ -141,7 +141,7 @@ const handleSave = async () => {
 onLoad(async (options) => {
   if (options.id) {
     dishId.value = Number(options.id);
-    const res = await proxy.$api.getDishById(dishId.value);
+    const res = await proxy.$api.getDishById({ id: dishId.value });
     if (res?.code === 200 && res?.data) {
       const dish = res.data;
       form.value = {

@@ -77,6 +77,10 @@
           </view>
         </view>
       </view>
+      <view class="load-more">
+        <text v-if="loading">加载中...</text>
+        <text v-else-if="noMore">没有更多了</text>
+      </view>
     </view>
   </view>
 </template>
@@ -84,12 +88,19 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { getCurrentInstance } from 'vue';
+import { onReachBottom } from '@dcloudio/uni-app';
 
 const { proxy } = getCurrentInstance();
 
 const location = ref('校园内');
 const searchKeyword = ref('');
 const canteenList = ref([]);
+
+// 分页状态
+const current = ref(1);
+const pageSize = 5;
+const loading = ref(false);
+const noMore = ref(false);
 const bannerList = ref([
   {
     image:
@@ -118,13 +129,29 @@ const buildBanner = async (canteenId) => {
 };
 
 const loadCanteens = async () => {
+  if (loading.value || noMore.value) return;
+  loading.value = true;
   try {
-    const res = await proxy.$api.getCanteens();
-    if (res?.code === 200 && Array.isArray(res.data)) {
-      canteenList.value = res.data;
-      buildBanner(res.data[0]?.id || 1);
+    const res = await proxy.$api.getCanteensPage({ current: current.value, size: pageSize });
+    console.log('分页响应:', JSON.stringify(res));
+    if (res?.code === 200 && res.data) {
+      const records = res.data.records || [];
+      const total = res.data.total || 0;
+      if (current.value === 1 && records.length > 0) {
+        buildBanner(records[0]?.id || 1);
+      }
+      canteenList.value.push(...records);
+      if (canteenList.value.length >= total) {
+        noMore.value = true;
+      } else {
+        current.value++;
+      }
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    console.error('加载食堂失败:', e);
+  } finally {
+    loading.value = false;
+  }
 };
 
 const goCanteen = (canteen) => {
@@ -150,6 +177,10 @@ const onLocate = async () => {
   })
 };
 
+
+onReachBottom(() => {
+  loadCanteens();
+});
 
 onMounted(() => {
   // 检查用户是否已登录
@@ -265,6 +296,12 @@ onMounted(() => {
     color: #ff9800;
     font-weight: 600;
   }
+}
+.load-more {
+  text-align: center;
+  padding: 20rpx 0;
+  color: #999;
+  font-size: 26rpx;
 }
 .navbar-title{
   padding-top: 60rpx;

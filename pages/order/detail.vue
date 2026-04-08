@@ -127,7 +127,7 @@ const handlePay = async () => {
   if (!order.value.id || order.value.paid) return;
   try {
     uni.showLoading({ title: '支付中...' });
-    const res = await proxy.$api.updateOrder(order.value.id, { paid: true, payType: '校园卡', status: 'pending' });
+    const res = await proxy.$api.updateOrder({ id: order.value.id, paid: true, payType: '校园卡', status: 'pending' });
     uni.hideLoading();
     if (res?.code === 200) {
       order.value.paid = true;
@@ -151,7 +151,7 @@ const confirmCancel = () => {
 // 处理取消订单
 const handleCancel = async () => {
   if (!pendingOrderId.value) return;
-  await proxy.$api.updateOrder(pendingOrderId.value, { status: 'canceled' });
+  await proxy.$api.updateOrder({ id: pendingOrderId.value, status: 'canceled' });
   uni.showToast({ title: '取消成功', icon: 'success' });
   modal.value.close();
   pendingOrderId.value = null;
@@ -168,7 +168,7 @@ const cancel = () => {
 onLoad(async (options) => {
   if (options.id) {
     try {
-      const res = await proxy.$api.getOrderById(options.id);
+      const res = await proxy.$api.getOrderById({ id: options.id });
       if (res?.code === 200 && res?.data) {
         order.value = { ...order.value, ...res.data };
       }

@@ -83,7 +83,7 @@ const filteredDishes = computed(() => {
 const toggleShelf = async (dish) => {
   uni.showLoading({ title: '处理中...' });
   try {
-    const res = await proxy.$api.updateDish(dish.id, { available: !dish.available });
+    const res = await proxy.$api.updateDish({ id: dish.id, available: !dish.available });
     uni.hideLoading();
     if (res?.code === 200) {
       dish.available = !dish.available;

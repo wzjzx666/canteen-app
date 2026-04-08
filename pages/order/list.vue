@@ -90,7 +90,7 @@ const goToDetail = (orderId) => {
 };
 const handleCancel = async () => {
   if (!pendingOrderId.value) return;
-  await proxy.$api.updateOrder(pendingOrderId.value, { status: 'canceled' });
+  await proxy.$api.updateOrder({ id: pendingOrderId.value, status: 'canceled' });
   uni.showToast({ title: '取消成功', icon: 'success' });
   modal.value.close();
   pendingOrderId.value = null;
